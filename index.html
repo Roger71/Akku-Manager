@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-title" content="Akku Manager">
     <meta name="theme-color" content="#f2f2f7">
 
-    <!-- Dynamisches Apple Touch Icon & Favicon -->
     <link rel="icon" type="image/png" id="favicon">
     <link rel="apple-touch-icon" id="appleTouchIcon">
 
@@ -20,6 +19,10 @@
             --card-bg: #ffffff;
             --primary: #0066ff;
             --primary-light: #e8f0fe;
+            --success: #34c759;
+            --success-light: #e8f8ec;
+            --warning: #ff9500;
+            --warning-light: #fff5e6;
             --danger: #ff3b30;
             --danger-light: #ffe5e5;
             --text-dark: #1c1c1e;
@@ -47,15 +50,14 @@
             margin-left: auto;
             margin-right: auto;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* HEADER SECTION WITH TOP PLUS BUTTON */
+        /* HEADER */
         header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin: 8px 4px 16px 4px;
+            margin: 8px 4px 14px 4px;
         }
 
         .header-left {
@@ -65,22 +67,18 @@
         }
 
         .header-icon-box {
-            width: 48px;
-            height: 48px;
+            width: 46px;
+            height: 46px;
             flex-shrink: 0;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: #121318;
             overflow: hidden;
-            transform: translateZ(0);
         }
 
         .header-icon-box svg {
-            width: 48px;
-            height: 48px;
+            width: 46px;
+            height: 46px;
             display: block;
         }
 
@@ -89,7 +87,6 @@
             font-weight: 800;
             letter-spacing: -0.4px;
             margin: 0 0 2px 0;
-            color: var(--text-dark);
             line-height: 1.1;
         }
 
@@ -100,10 +97,9 @@
             font-weight: 500;
         }
 
-        /* HEADER ADD BUTTON */
         .btn-add-header {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--primary);
             color: white;
@@ -111,16 +107,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            font-weight: 400;
+            font-size: 20px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 102, 255, 0.35);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .btn-add-header:active {
-            transform: scale(0.9);
+            transition: transform 0.2s ease, background-color 0.2s ease;
         }
 
         .btn-add-header.active {
@@ -130,7 +120,55 @@
             transform: rotate(90deg);
         }
 
-        /* COLLAPSIBLE FORM CARD */
+        /* STATS BAR */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 10px 8px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* SEARCH BAR */
+        .search-container {
+            margin-bottom: 14px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            font-size: 14px;
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* FORM CARD */
         .form-card {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
@@ -138,33 +176,26 @@
             margin-bottom: 20px;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
-            display: none; /* Standardmäßig ausgeblendet */
-            animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: none;
+            animation: slideDown 0.25s ease;
         }
 
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .form-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .card-title {
             font-size: 16px;
             font-weight: 700;
             margin: 0;
-            letter-spacing: -0.3px;
         }
 
         .btn-close-form {
@@ -176,22 +207,15 @@
             font-size: 13px;
             color: var(--text-muted);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
         }
 
-        /* FORM STYLES */
         .grid-form {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
 
-        .full-width {
-            grid-column: span 2;
-        }
+        .full-width { grid-column: span 2; }
 
         .form-group {
             display: flex;
@@ -202,15 +226,15 @@
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.5px;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             margin-left: 2px;
         }
 
         input, select {
             width: 100%;
-            padding: 11px 12px;
+            padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             font-size: 15px;
@@ -218,7 +242,6 @@
             background-color: #f9f9fb;
             color: var(--text-dark);
             outline: none;
-            transition: all 0.2s ease;
             -webkit-appearance: none;
         }
 
@@ -227,7 +250,7 @@
             background-repeat: no-repeat;
             background-position: right 12px top 50%;
             background-size: 10px auto;
-            padding-right: 30px;
+            padding-right: 28px;
         }
 
         input:focus, select:focus {
@@ -236,7 +259,6 @@
             box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
         }
 
-        /* MANUFACTURER CHIPS */
         .quick-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -248,21 +270,13 @@
             background: #eef0f5;
             border: none;
             border-radius: 20px;
-            padding: 6px 12px;
+            padding: 5px 10px;
             font-size: 12px;
             font-weight: 600;
             color: #4a4a4f;
             cursor: pointer;
-            transition: all 0.15s ease;
         }
 
-        .btn-chip:active {
-            background: var(--primary);
-            color: white;
-            transform: scale(0.95);
-        }
-
-        /* BUTTONS */
         .form-actions {
             display: flex;
             gap: 10px;
@@ -274,32 +288,26 @@
             background: linear-gradient(180deg, #0071e3 0%, #005bb5 100%);
             color: white;
             border: none;
-            padding: 14px;
+            padding: 13px;
             border-radius: var(--radius-md);
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
-            transition: transform 0.1s ease, filter 0.2s ease;
-        }
-
-        button.btn-add:active {
-            transform: scale(0.98);
-            filter: brightness(0.9);
         }
 
         button.btn-cancel {
             background: #e5e5ea;
             color: var(--text-dark);
             border: none;
-            padding: 14px 18px;
+            padding: 13px 16px;
             border-radius: var(--radius-md);
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
         }
 
-        /* SECTION LIST HEADERS */
+        /* LIST HEADERS & ITEM CARDS */
         .section-header {
             font-size: 15px;
             font-weight: 800;
@@ -307,7 +315,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            letter-spacing: -0.3px;
         }
 
         .section-badge {
@@ -315,58 +322,73 @@
             color: #475569;
             font-size: 12px;
             font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
-        /* BATTERY ITEM TABLE */
         .table-container {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
             overflow: hidden;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .battery-item {
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border-color);
-            transition: background 0.2s ease;
         }
 
-        .battery-item:last-child {
-            border-bottom: none;
-        }
+        .battery-item:last-child { border-bottom: none; }
 
         .battery-main-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .akku-title {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
-        /* TYPE BADGES */
+        /* BADGES */
         .type-badge {
             font-size: 11px;
             font-weight: 800;
-            padding: 3px 8px;
+            padding: 2px 7px;
             border-radius: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .type-lipo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
         .type-lihv { background: #faf5ff; color: #7e22ce; border: 1px solid #f3e8ff; }
         .type-life { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
         .type-liion { background: #ecfeff; color: #0e7490; border: 1px solid #cff4fc; }
+
+        .status-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .status-ready { background: var(--success-light); color: #15803d; }
+        .status-storage { background: var(--warning-light); color: #b45309; }
+        .status-retired { background: var(--danger-light); color: var(--danger); }
+
+        .qty-badge {
+            background: #71717a;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
 
         .manufacturer-tag {
             font-size: 13px;
@@ -377,33 +399,37 @@
         .cap-tag {
             color: var(--primary);
             font-weight: 800;
-            font-size: 17px;
-            letter-spacing: -0.3px;
+            font-size: 16px;
         }
 
         .battery-data-row {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             flex-wrap: wrap;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
         }
 
         .data-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            font-size: 13px;
+            gap: 3px;
+            font-size: 12px;
             color: #475569;
         }
 
-        .data-badge strong {
-            font-weight: 700;
-            color: var(--text-dark);
+        .charge-amp-highlight {
+            background: #eff6ff;
+            color: var(--primary);
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid #dbeafe;
         }
 
-        /* ACTIONS */
+        .data-badge strong { font-weight: 700; color: var(--text-dark); }
+
         .action-btns {
             display: flex;
             gap: 6px;
@@ -411,19 +437,14 @@
 
         .btn-action {
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.15s ease;
-        }
-
-        .btn-action:active {
-            transform: scale(0.9);
         }
 
         .btn-edit { background: var(--primary-light); color: var(--primary); }
@@ -431,7 +452,7 @@
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 35px 20px;
             color: var(--text-muted);
             background: var(--card-bg);
             border-radius: var(--radius-lg);
@@ -439,24 +460,24 @@
         }
 
         .btn-empty-add {
-            margin-top: 14px;
+            margin-top: 12px;
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 20px;
+            padding: 9px 16px;
+            border-radius: 18px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
         }
 
-        /* BACKUP FOOTER BAR */
+        /* BACKUP FOOTER */
         .backup-bar {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             padding: 10px 14px;
-            margin-top: 28px;
+            margin-top: 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -464,32 +485,23 @@
         }
 
         .backup-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .backup-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .backup-actions { display: flex; gap: 8px; }
 
         .btn-secondary-sm {
             background: #eef0f5;
             color: var(--text-dark);
             border: none;
-            padding: 7px 12px;
+            padding: 6px 11px;
             border-radius: var(--radius-sm);
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: background 0.15s ease;
-        }
-
-        .btn-secondary-sm:active {
-            background: #d1d5db;
         }
     </style>
 </head>
@@ -507,6 +519,27 @@
             <span id="addIconSymbol">＋</span>
         </button>
     </header>
+
+    <!-- STATISTIK BAR -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="statCount">0</div>
+            <div class="stat-label">Akkus Gesamt</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="statCapacity">0 Ah</div>
+            <div class="stat-label">Gesamtkapazität</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="statWeight">0 g</div>
+            <div class="stat-label">Gesamtgewicht</div>
+        </div>
+    </div>
+
+    <!-- SCHNELLSUCHE -->
+    <div class="search-container">
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Akku suchen (z. B. 4S, CNHL, 1500)..." oninput="render()">
+    </div>
 
     <!-- AUSKLAPPBARES EINGABEFORMULAR -->
     <div class="form-card" id="formCard">
@@ -530,7 +563,6 @@
                         <button type="button" class="btn-chip" onclick="setManufacturer('Ovonic')">Ovonic</button>
                         <button type="button" class="btn-chip" onclick="setManufacturer('Gens ace')">Gens ace</button>
                         <button type="button" class="btn-chip" onclick="setManufacturer('Spektrum')">Spektrum</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('GNB')">GNB</button>
                     </div>
                 </div>
 
@@ -545,23 +577,37 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="ready" selected>🟢 Flugbereit</option>
+                        <option value="storage">🟡 Storage</option>
+                        <option value="retired">🔴 Ausgemustert</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label>Kapazität (mAh)</label>
-                    <input type="number" id="capacity" placeholder="z. B. 1500" min="50" max="50000" required>
+                    <input type="number" id="capacity" placeholder="z. B. 1500" min="50" max="50000" inputmode="numeric" required>
                 </div>
 
                 <div class="form-group">
                     <label>Zellenzahl (S)</label>
-                    <input type="number" id="cellCount" placeholder="z. B. 4" min="1" max="14" required>
+                    <input type="number" id="cellCount" placeholder="z. B. 4" min="1" max="14" inputmode="numeric" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Gewicht (g)</label>
-                    <input type="number" id="weight" placeholder="z. B. 180" step="0.1" required>
+                    <label>Stückzahl (Anzahl)</label>
+                    <input type="number" id="qty" placeholder="1" min="1" max="99" value="1" inputmode="numeric" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Gewicht pro Akku (g)</label>
+                    <input type="number" id="weight" placeholder="z. B. 180" step="0.1" inputmode="decimal" required>
                 </div>
 
                 <div class="form-group">
                     <label>Laderate (C)</label>
-                    <input type="number" id="chargeRate" placeholder="z. B. 1.0" step="0.1" required>
+                    <input type="number" id="chargeRate" placeholder="z. B. 1.0" step="0.1" inputmode="decimal" required>
                 </div>
 
                 <div class="form-group">
@@ -582,10 +628,10 @@
         </form>
     </div>
 
-    <!-- AKKU LISTE ALS ERSTES SICHTBAR -->
+    <!-- AKKU LISTE -->
     <div id="batteryList"></div>
 
-    <!-- BACKUP FOOTER BAR -->
+    <!-- BACKUP FOOTER -->
     <div class="backup-bar">
         <span class="backup-title">💾 Datensicherung</span>
         <div class="backup-actions">
@@ -596,7 +642,7 @@
     </div>
 
     <script>
-        // --- CNHL G+ PLUS LIPO ICON GENERATOR ---
+        // --- CNHL SVG ICON ---
         const cnhlGPlusIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
             <defs>
                 <linearGradient id="cnhl-bg" x1="0" y1="0" x2="0" y2="1">
@@ -620,10 +666,8 @@
                     <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#84cc16" flood-opacity="0.3"/>
                 </filter>
             </defs>
-            
             <rect width="512" height="512" rx="115" fill="url(#cnhl-bg)"/>
             <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#84cc16" stroke-opacity="0.25" stroke-width="3"/>
-            
             <g filter="url(#cnhl-glow)">
                 <path d="M 220 135 C 210 70, 270 65, 295 55" stroke="#ef4444" stroke-width="20" fill="none" stroke-linecap="round"/>
                 <path d="M 185 135 C 175 55, 235 50, 260 40" stroke="#3f3f46" stroke-width="20" fill="none" stroke-linecap="round"/>
@@ -665,24 +709,18 @@
             img.src = url;
         })();
 
-        // --- APP LOGIC ---
+        // --- STATE & DATA ---
         let batteries = [];
         try {
             batteries = JSON.parse(localStorage.getItem('lipo_batteries_db')) || [];
-        } catch (e) {
-            console.log('LocalStorage nicht zugänglich');
-        }
+        } catch (e) {}
 
         let editingId = null;
 
-        // FORM TOGGLE LOGIC
         function toggleForm() {
             const card = document.getElementById('formCard');
-            if (card.style.display === 'none' || card.style.display === '') {
-                showForm();
-            } else {
-                hideForm();
-            }
+            if (card.style.display === 'none' || card.style.display === '') showForm();
+            else hideForm();
         }
 
         function showForm() {
@@ -708,10 +746,7 @@
         function formatDischarge(val) {
             if (!val) return '-';
             let str = String(val).trim();
-            if (!str.toLowerCase().endsWith('c')) {
-                str += 'C';
-            }
-            return str;
+            return str.toLowerCase().endsWith('c') ? str : str + 'C';
         }
 
         document.getElementById('lipoForm').addEventListener('submit', (e) => {
@@ -720,8 +755,10 @@
             const batteryData = {
                 manufacturer: document.getElementById('manufacturer').value.trim() || "-",
                 type: document.getElementById('type').value,
+                status: document.getElementById('status').value,
                 capacity: parseInt(document.getElementById('capacity').value),
                 cellCount: parseInt(document.getElementById('cellCount').value),
+                qty: parseInt(document.getElementById('qty').value) || 1,
                 chargeRate: parseFloat(document.getElementById('chargeRate').value),
                 dischargeRate: document.getElementById('dischargeRate').value.trim(),
                 weight: parseFloat(document.getElementById('weight').value),
@@ -730,9 +767,7 @@
 
             if (editingId !== null) {
                 const index = batteries.findIndex(b => b.id === editingId);
-                if (index !== -1) {
-                    batteries[index] = { id: editingId, ...batteryData };
-                }
+                if (index !== -1) batteries[index] = { id: editingId, ...batteryData };
             } else {
                 batteries.push({ id: Date.now(), ...batteryData });
             }
@@ -748,8 +783,10 @@
             editingId = id;
             document.getElementById('manufacturer').value = b.manufacturer === '-' ? '' : b.manufacturer;
             document.getElementById('type').value = b.type;
+            document.getElementById('status').value = b.status || 'ready';
             document.getElementById('capacity').value = b.capacity;
             document.getElementById('cellCount').value = b.cellCount;
+            document.getElementById('qty').value = b.qty || 1;
             document.getElementById('weight').value = b.weight;
             document.getElementById('chargeRate').value = b.chargeRate;
             document.getElementById('dischargeRate').value = b.dischargeRate || '';
@@ -757,7 +794,6 @@
 
             document.getElementById('formTitle').innerText = "✏️ Akku bearbeiten";
             document.getElementById('submitBtn').innerText = "Änderung Speichern";
-
             showForm();
         }
 
@@ -765,6 +801,8 @@
             editingId = null;
             document.getElementById('lipoForm').reset();
             document.getElementById('type').value = "LiPo";
+            document.getElementById('status').value = "ready";
+            document.getElementById('qty').value = "1";
             document.getElementById('formTitle').innerText = "➕ Neuen Akku hinzufügen";
             document.getElementById('submitBtn').innerText = "Akku Speichern";
         }
@@ -787,52 +825,37 @@
         function formatDate(dateStr) {
             if (!dateStr) return 'k. A.';
             const parts = dateStr.split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}.${parts[1]}.${parts[0]}`;
-            }
-            return dateStr;
+            return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateStr;
         }
 
         function exportData() {
-            if (!batteries || batteries.length === 0) {
-                alert("Keine Akkus zum Exportieren vorhanden.");
-                return;
-            }
-
-            const jsonStr = JSON.stringify(batteries, null, 2);
-            const blob = new Blob([jsonStr], { type: "application/json" });
+            if (!batteries.length) return alert("Keine Akkus zum Exportieren vorhanden.");
+            const blob = new Blob([JSON.stringify(batteries, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
-
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.href = url;
-            downloadAnchor.download = `rogers_akkus_backup_${new Date().toISOString().slice(0,10)}.json`;
-            
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            document.body.removeChild(downloadAnchor);
-
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rogers_akkus_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
         function importData(event) {
-            const fileReader = new FileReader();
-            fileReader.onload = function(e) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
+                    if (Array.isArray(imported) && imported.every(i => i.capacity && i.cellCount)) {
                         batteries = imported;
                         saveAndRender();
                         alert("Backup erfolgreich geladen!");
                     } else {
-                        alert("Ungültiges Dateiformat.");
+                        alert("Ungültiges Backup-Dateiformat.");
                     }
                 } catch (err) {
                     alert("Fehler beim Lesen der Datei.");
                 }
             };
-            if (event.target.files[0]) {
-                fileReader.readAsText(event.target.files[0]);
-            }
+            if (event.target.files[0]) reader.readAsText(event.target.files[0]);
         }
 
         function getTypeClass(type) {
@@ -844,12 +867,44 @@
             }
         }
 
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'storage': return '<span class="status-badge status-storage">Storage</span>';
+                case 'retired': return '<span class="status-badge status-retired">Defekt</span>';
+                default: return '<span class="status-badge status-ready">Flugbereit</span>';
+            }
+        }
+
+        function updateStats() {
+            let totalCount = 0;
+            let totalCapMah = 0;
+            let totalWeightG = 0;
+
+            batteries.forEach(b => {
+                const qty = b.qty || 1;
+                totalCount += qty;
+                totalCapMah += (b.capacity * qty);
+                totalWeightG += (b.weight * qty);
+            });
+
+            document.getElementById('statCount').innerText = totalCount;
+            document.getElementById('statCapacity').innerText = (totalCapMah / 1000).toFixed(1) + " Ah";
+            document.getElementById('statWeight').innerText = (totalWeightG >= 1000) ? (totalWeightG / 1000).toFixed(2) + " kg" : Math.round(totalWeightG) + " g";
+        }
+
         function render() {
+            updateStats();
             const listDiv = document.getElementById('batteryList');
+            const filterText = document.getElementById('searchInput').value.toLowerCase().trim();
             listDiv.innerHTML = '';
 
+            const filteredBatteries = batteries.filter(b => {
+                const searchStr = `${b.manufacturer} ${b.type} ${b.capacity} ${b.cellCount}s`.toLowerCase();
+                return searchStr.includes(filterText);
+            });
+
             const grouped = {};
-            batteries.forEach(b => {
+            filteredBatteries.forEach(b => {
                 if (!grouped[b.cellCount]) grouped[b.cellCount] = [];
                 grouped[b.cellCount].push(b);
             });
@@ -860,8 +915,8 @@
                 listDiv.innerHTML = `
                     <div class="empty-state">
                         <div style="font-size: 36px; margin-bottom: 8px;">🔋</div>
-                        <p style="margin: 0; font-weight: 600; color: #1c1c1e;">Keine Akkus eingetragen</p>
-                        <p style="margin: 4px 0 0 0; font-size: 13px;">Tippe auf das Plus oben, um deinen ersten Akku hinzuzufügen.</p>
+                        <p style="margin: 0; font-weight: 600; color: #1c1c1e;">Keine Akkus gefunden</p>
+                        <p style="margin: 4px 0 0 0; font-size: 13px;">Tippe auf das Plus oben, um einen Akku hinzuzufügen.</p>
                         <button class="btn-empty-add" onclick="showForm()">➕ Akku hinzufügen</button>
                     </div>
                 `;
@@ -869,22 +924,32 @@
             }
 
             sortedCells.forEach(cell => {
+                const cellGroup = grouped[cell];
+                const totalCellPacks = cellGroup.reduce((acc, curr) => acc + (curr.qty || 1), 0);
+
                 const section = document.createElement('div');
                 section.className = 'section-header';
                 section.innerHTML = `
                     <span>${cell}S Akkus</span>
-                    <span class="section-badge">${grouped[cell].length} Akku${grouped[cell].length > 1 ? 's' : ''}</span>
+                    <span class="section-badge">${totalCellPacks} Pack${totalCellPacks > 1 ? 's' : ''}</span>
                 `;
                 listDiv.appendChild(section);
 
                 const container = document.createElement('div');
                 container.className = 'table-container';
 
-                container.innerHTML = grouped[cell].map(b => `
+                container.innerHTML = cellGroup.map(b => {
+                    // Ladeampere-Berechnung (Ah * C)
+                    const chargeAmps = ((b.capacity / 1000) * b.chargeRate).toFixed(1);
+                    const qty = b.qty || 1;
+
+                    return `
                     <div class="battery-item">
                         <div class="battery-main-row">
                             <div class="akku-title">
+                                ${qty > 1 ? `<span class="qty-badge">${qty}x</span>` : ''}
                                 <span class="type-badge ${getTypeClass(b.type)}">${b.type}</span>
+                                ${getStatusBadge(b.status)}
                                 ${b.manufacturer && b.manufacturer !== '-' ? `<span class="manufacturer-tag">${b.manufacturer}</span>` : ''}
                                 <span class="cap-tag">${b.capacity} mAh</span>
                             </div>
@@ -895,12 +960,13 @@
                         </div>
 
                         <div class="battery-data-row">
-                            <span class="data-badge">⚡ <strong>${b.chargeRate}C / ${formatDischarge(b.dischargeRate)}</strong></span>
+                            <span class="charge-amp-highlight">⚡ ${chargeAmps} A (${b.chargeRate}C)</span>
+                            <span class="data-badge">💥 <strong>${formatDischarge(b.dischargeRate)}</strong></span>
                             <span class="data-badge">⚖️ <strong>${b.weight}g</strong></span>
                             <span class="data-badge">📅 <strong>${formatDate(b.purchaseDate)}</strong></span>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
 
                 listDiv.appendChild(container);
             });
