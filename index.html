@@ -1,1209 +1,208 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Roger’s Akku Manager</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Akku Manager">
-    <meta name="theme-color" content="#f2f2f7">
-
-    <link rel="icon" type="image/png" id="favicon">
-    <link rel="apple-touch-icon" id="appleTouchIcon">
-
-    <style>
-        :root {
-            --bg-color: #f2f2f7;
-            --card-bg: #ffffff;
-            --primary: #0066ff;
-            --primary-light: #e8f0fe;
-            --success: #34c759;
-            --success-light: #e8f8ec;
-            --warning: #ff9500;
-            --warning-light: #fff5e6;
-            --danger: #ff3b30;
-            --danger-light: #ffe5e5;
-            --text-dark: #1c1c1e;
-            --text-muted: #8e8e93;
-            --border-color: rgba(60, 60, 67, 0.12);
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-        }
-
-        /* DARK MODE SUPPORT */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #000000;
-                --card-bg: #1c1c1e;
-                --text-dark: #f2f2f7;
-                --text-muted: #8e8e93;
-                --border-color: rgba(255, 255, 255, 0.12);
-                --primary-light: #0a2540;
-                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-                --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
-            }
-            input, select {
-                background-color: #2c2c2e !important;
-                color: #ffffff !important;
-            }
-            .btn-chip {
-                background: #2c2c2e !important;
-                color: #d1d1d6 !important;
-            }
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            margin: 0;
-            padding: calc(12px + env(safe-area-inset-top)) 12px calc(40px + env(safe-area-inset-bottom)) 12px;
-            max-width: 650px;
-            margin-left: auto;
-            margin-right: auto;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* HEADER */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 8px 4px 14px 4px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-icon-box {
-            width: 46px;
-            height: 46px;
-            flex-shrink: 0;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            background: #121318;
-            overflow: hidden;
-        }
-
-        .header-icon-box svg {
-            width: 46px;
-            height: 46px;
-            display: block;
-        }
-
-        .header-text h1 {
-            font-size: 19px;
-            font-weight: 800;
-            letter-spacing: -0.4px;
-            margin: 0 0 2px 0;
-            line-height: 1.1;
-        }
-
-        .header-text p {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin: 0;
-            font-weight: 500;
-        }
-
-        .btn-add-header {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.35);
-            transition: transform 0.2s ease, background-color 0.2s ease;
-        }
-
-        .btn-add-header.active {
-            background: #e5e5ea;
-            color: var(--text-dark);
-            box-shadow: none;
-            transform: rotate(90deg);
-        }
-
-        /* STATS BAR */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-md);
-            padding: 10px 8px;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-        }
-
-        .stat-value {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .stat-label {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-
-        /* TOOL BAR BUTTONS (Cheat-Sheet & Parallelladen) */
-        .tools-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .btn-tool {
-            flex: 1;
-            padding: 8px 10px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-dark);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* COLLAPSIBLE TOOL PANELS */
-        .tool-panel {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 14px;
-            margin-bottom: 14px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-
-        /* SPANNUNGS TABLE */
-        .voltage-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin-top: 8px;
-        }
-
-        .voltage-table th {
-            text-align: left;
-            padding: 6px 4px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-muted);
-            font-size: 10px;
-            text-transform: uppercase;
-        }
-
-        .voltage-table td {
-            padding: 8px 4px;
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 600;
-        }
-
-        .voltage-table tr:last-child td { border-bottom: none; }
-        .alert-under-load { color: var(--danger); font-weight: 800; }
-
-        /* SEARCH BAR */
-        .search-container {
-            margin-bottom: 14px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            font-size: 14px;
-            outline: none;
-            box-shadow: var(--shadow-sm);
-            color: var(--text-dark);
-        }
-
-        /* FORM CARD */
-        .form-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 18px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-            display: none;
-            animation: slideDown 0.25s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .btn-close-form {
-            background: #f2f2f7;
-            border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            font-size: 13px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .grid-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .full-width { grid-column: span 2; }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            margin-bottom: 5px;
-            margin-left: 2px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            font-weight: 500;
-            background-color: #f9f9fb;
-            color: var(--text-dark);
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        select {
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238E8E93%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px top 50%;
-            background-size: 10px auto;
-            padding-right: 28px;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
-        }
-
-        .quick-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
-        }
-
-        .btn-chip {
-            background: #eef0f5;
-            border: none;
-            border-radius: 20px;
-            padding: 5px 10px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #4a4a4f;
-            cursor: pointer;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        button.btn-add {
-            flex: 1;
-            background: linear-gradient(180deg, #0071e3 0%, #005bb5 100%);
-            color: white;
-            border: none;
-            padding: 13px;
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
-        }
-
-        button.btn-cancel {
-            background: #e5e5ea;
-            color: var(--text-dark);
-            border: none;
-            padding: 13px 16px;
-            border-radius: var(--radius-md);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* LIST HEADERS & ITEM CARDS */
-        .section-header {
-            font-size: 15px;
-            font-weight: 800;
-            margin: 18px 0 8px 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .section-badge {
-            background: #e2e8f0;
-            color: #475569;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        .table-container {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            margin-bottom: 14px;
-        }
-
-        .battery-item {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .battery-item:last-child { border-bottom: none; }
-
-        .battery-main-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .akku-title {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        /* BADGES */
-        .type-badge {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 2px 7px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-
-        .type-lipo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
-        .type-lihv { background: #faf5ff; color: #7e22ce; border: 1px solid #f3e8ff; }
-        .type-life { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
-        .type-liion { background: #ecfeff; color: #0e7490; border: 1px solid #cff4fc; }
-
-        .status-badge {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-        .status-ready { background: var(--success-light); color: #15803d; }
-        .status-storage { background: var(--warning-light); color: #b45309; }
-        .status-retired { background: var(--danger-light); color: var(--danger); }
-
-        .qty-badge {
-            background: #71717a;
-            color: white;
-            font-size: 11px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 10px;
-        }
-
-        .manufacturer-tag {
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .cap-tag {
-            color: var(--primary);
-            font-weight: 800;
-            font-size: 16px;
-        }
-
-        .battery-data-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .data-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            font-size: 12px;
-        }
-
-        .charge-amp-highlight {
-            background: #eff6ff;
-            color: var(--primary);
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 6px;
-            border: 1px solid #dbeafe;
-        }
-
-        .cycle-btn {
-            background: var(--primary-light);
-            color: var(--primary);
-            border: none;
-            padding: 2px 7px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 6px;
-        }
-
-        .btn-action {
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-edit { background: var(--primary-light); color: var(--primary); }
-        .btn-del { background: var(--danger-light); color: var(--danger); }
-
-        .empty-state {
-            text-align: center;
-            padding: 35px 20px;
-            color: var(--text-muted);
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-empty-add {
-            margin-top: 12px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 9px 16px;
-            border-radius: 18px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* BACKUP FOOTER */
-        .backup-bar {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 10px 14px;
-            margin-top: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .backup-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .backup-actions { display: flex; gap: 8px; }
-
-        .btn-secondary-sm {
-            background: #eef0f5;
-            color: var(--text-dark);
-            border: none;
-            padding: 6px 11px;
-            border-radius: var(--radius-sm);
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiPo-Manager</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --accent: #0a84ff;
+      --text: #ffffff;
+      --subtext: #a0a0a0;
+      --border: #2c2c2e;
+      --red: #ff453a;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+      -webkit-user-select: none;
+    }
+    h1 { font-size: 24px; margin-bottom: 16px; }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    label { display: block; font-size: 12px; color: var(--subtext); margin-top: 8px; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #2c2c2e;
+      color: #fff;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button.submit-btn {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .filter-btn {
+      background: #2c2c2e;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .lipo-item {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .lipo-title { font-weight: bold; font-size: 16px; }
+    .lipo-sub { font-size: 13px; color: var(--subtext); margin-top: 2px; }
+    .delete-btn {
+      background: transparent;
+      color: var(--red);
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-left">
-            <div class="header-icon-box" id="headerIcon"></div>
-            <div class="header-text">
-                <h1>Roger’s Akku Manager</h1>
-                <p>Akkus einfach & präzise verwalten</p>
-            </div>
+  <h1>LiPo-Manager</h1>
+
+  <!-- Akku Hinzufügen -->
+  <div class="card">
+    <strong style="font-size: 16px;">Neuen Akku anlegen</strong>
+    <form id="lipoForm">
+      <label>Bezeichnung / Name</label>
+      <input type="text" id="name" placeholder="z. B. Turnigy Rapid 6S" required>
+
+      <div style="display: flex; gap: 8px;">
+        <div style="flex: 1;">
+          <label>Zellen (S)</label>
+          <select id="cells">
+            <option value="1S">1S</option>
+            <option value="2S">2S</option>
+            <option value="3S">3S</option>
+            <option value="4S">4S</option>
+            <option value="6S" selected>6S</option>
+          </select>
         </div>
-        <button class="btn-add-header" id="toggleFormBtn" onclick="toggleForm()" aria-label="Neuer Akku">
-            <span id="addIconSymbol">＋</span>
-        </button>
-    </header>
-
-    <!-- STATISTIK BAR -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value" id="statCount">0</div>
-            <div class="stat-label">Akkus Gesamt</div>
+        <div style="flex: 1;">
+          <label>Kapazität (mAh)</label>
+          <input type="number" id="capacity" placeholder="7000" required>
         </div>
-        <div class="stat-card">
-            <div class="stat-value" id="statCapacity">0 Ah</div>
-            <div class="stat-label">Gesamtkapazität</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="statWeight">0 g</div>
-            <div class="stat-label">Gesamtgewicht</div>
-        </div>
-    </div>
-
-    <!-- TOOL BUTTONS (SPANNUNG & PARALLELLADEN) -->
-    <div class="tools-bar">
-        <button class="btn-tool" onclick="toggleTool('voltagePanel')">⚡ Spannungs-Spickzettel</button>
-        <button class="btn-tool" onclick="toggleTool('parallelPanel')">🔋 Parallellade-Rechner</button>
-    </div>
-
-    <!-- SPANNUNGS-SPICKZETTEL PANEL -->
-    <div class="tool-panel" id="voltagePanel">
-        <div class="form-header">
-            <h3 class="card-title">⚡ Zellenspannungen im Überblick</h3>
-            <button class="btn-close-form" onclick="toggleTool('voltagePanel')">✕</button>
-        </div>
-        <table class="voltage-table">
-            <thead>
-                <tr>
-                    <th>Typ</th>
-                    <th>Voll</th>
-                    <th>Storage</th>
-                    <th>Leer (Ruhe)</th>
-                    <th class="alert-under-load">Min. (unter Last)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>LiPo</strong></td>
-                    <td>4.20 V</td>
-                    <td>3.85 V</td>
-                    <td>3.50 V</td>
-                    <td class="alert-under-load">3.30 V</td>
-                </tr>
-                <tr>
-                    <td><strong>LiHV</strong></td>
-                    <td>4.35 V</td>
-                    <td>3.85 V</td>
-                    <td>3.50 V</td>
-                    <td class="alert-under-load">3.30 V</td>
-                </tr>
-                <tr>
-                    <td><strong>LiIon</strong></td>
-                    <td>4.20 V</td>
-                    <td>3.70 V</td>
-                    <td>3.00 V</td>
-                    <td class="alert-under-load">2.80 V</td>
-                </tr>
-                <tr>
-                    <td><strong>LiFe</strong></td>
-                    <td>3.60 V</td>
-                    <td>3.30 V</td>
-                    <td>2.80 V</td>
-                    <td class="alert-under-load">2.60 V</td>
-                </tr>
-            </tbody>
-        </table>
-        <p style="font-size: 11px; color: var(--text-muted); margin: 8px 0 0 0;">
-            * <strong>Min. unter Last:</strong> Absacken während Vollgas. Fällt die Spannung unter diesen Wert, droht permanente Schädigung der Chemie!
-        </p>
-    </div>
-
-    <!-- PARALLELLADE-RECHNER PANEL -->
-    <div class="tool-panel" id="parallelPanel">
-        <div class="form-header">
-            <h3 class="card-title">🔋 Parallellade-Rechner</h3>
-            <button class="btn-close-form" onclick="toggleTool('parallelPanel')">✕</button>
-        </div>
-        <div class="grid-form">
-            <div class="form-group">
-                <label>Kapazität (mAh)</label>
-                <input type="number" id="pCap" placeholder="1500" value="1500" oninput="calcParallel()" inputmode="numeric">
-            </div>
-            <div class="form-group">
-                <label>Anzahl Akkus</label>
-                <input type="number" id="pCount" placeholder="4" value="4" oninput="calcParallel()" inputmode="numeric">
-            </div>
-            <div class="form-group full-width">
-                <label>Laderate (C)</label>
-                <input type="number" id="pRate" placeholder="1.0" value="1.0" step="0.1" oninput="calcParallel()" inputmode="decimal">
-            </div>
-        </div>
-        <div style="margin-top: 12px; background: #eff6ff; padding: 10px; border-radius: 8px; text-align: center;">
-            <span style="font-size: 12px; color: #1e40af; font-weight: 700;">Empfohlener Ladestrom:</span>
-            <div style="font-size: 22px; font-weight: 900; color: var(--primary);" id="pResult">6.0 A</div>
-        </div>
-    </div>
-
-    <!-- SCHNELLSUCHE -->
-    <div class="search-container">
-        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Akku suchen (z. B. 4S, CNHL, 1500)..." oninput="render()">
-    </div>
-
-    <!-- AUSKLAPPBARES EINGABEFORMULAR -->
-    <div class="form-card" id="formCard">
-        <div class="form-header">
-            <h3 class="card-title" id="formTitle">➕ Neuen Akku hinzufügen</h3>
-            <button type="button" class="btn-close-form" onclick="hideForm()">✕</button>
-        </div>
-        
-        <form id="lipoForm">
-            <div class="grid-form">
-                <div class="form-group full-width">
-                    <label>Hersteller (Optional)</label>
-                    <input type="text" id="manufacturer" placeholder="Name eingeben oder wählen">
-                    <div class="quick-buttons">
-                        <button type="button" class="btn-chip" onclick="setManufacturer('CNHL')">CNHL</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Tattu')">Tattu</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('SLS')">SLS</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Wellpower')">Wellpower</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Turnigy')">Turnigy</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Hacker')">Hacker</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Ovonic')">Ovonic</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Gens ace')">Gens ace</button>
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Spektrum')">Spektrum</button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Akku Typ</label>
-                    <select id="type">
-                        <option value="LiPo" selected>LiPo</option>
-                        <option value="LiHV">LiHV</option>
-                        <option value="LiFe">LiFe</option>
-                        <option value="LiIon">LiIon</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Status</label>
-                    <select id="status">
-                        <option value="ready" selected>🟢 Flugbereit</option>
-                        <option value="storage">🟡 Storage</option>
-                        <option value="retired">🔴 Ausgemustert</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Kapazität (mAh)</label>
-                    <input type="number" id="capacity" placeholder="z. B. 1500" min="50" max="50000" inputmode="numeric" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Zellenzahl (S)</label>
-                    <input type="number" id="cellCount" placeholder="z. B. 4" min="1" max="14" inputmode="numeric" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Stückzahl (Anzahl)</label>
-                    <input type="number" id="qty" placeholder="1" min="1" max="99" value="1" inputmode="numeric" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Bisherige Zyklen</label>
-                    <input type="number" id="cycles" placeholder="0" min="0" value="0" inputmode="numeric">
-                </div>
-
-                <div class="form-group">
-                    <label>Gewicht pro Akku (g)</label>
-                    <input type="number" id="weight" placeholder="z. B. 180" step="0.1" inputmode="decimal" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Laderate (C)</label>
-                    <input type="number" id="chargeRate" placeholder="z. B. 1.0" step="0.1" inputmode="decimal" required>
-                </div>
-
-                <div class="form-group full-width">
-                    <label>Entladerate (C)</label>
-                    <input type="text" id="dischargeRate" placeholder="z. B. 70 oder 30/70" required>
-                </div>
-
-                <div class="form-group full-width">
-                    <label>Kaufdatum (Optional)</label>
-                    <input type="date" id="purchaseDate">
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button type="button" class="btn-cancel" onclick="hideForm()">Abbrechen</button>
-                <button type="submit" class="btn-add" id="submitBtn">Akku Speichern</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- AKKU LISTE -->
-    <div id="batteryList"></div>
-
-    <!-- BACKUP FOOTER -->
-    <div class="backup-bar">
-        <span class="backup-title">💾 Datensicherung</span>
-        <div class="backup-actions">
-            <button class="btn-secondary-sm" onclick="exportData()">📥 Export</button>
-            <button class="btn-secondary-sm" onclick="document.getElementById('importFile').click()">📤 Import</button>
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-        </div>
-    </div>
-
-    <script>
-        // --- CNHL SVG ICON ---
-        const cnhlGPlusIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-            <defs>
-                <linearGradient id="cnhl-bg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#181a20"/>
-                    <stop offset="100%" stop-color="#0a0b0e"/>
-                </linearGradient>
-                <linearGradient id="cnhl-green" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#84cc16"/>
-                    <stop offset="100%" stop-color="#15803d"/>
-                </linearGradient>
-                <linearGradient id="xt60-grad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#f59e0b"/>
-                    <stop offset="100%" stop-color="#b45309"/>
-                </linearGradient>
-                <linearGradient id="pack-body" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#27272a"/>
-                    <stop offset="100%" stop-color="#09090b"/>
-                </linearGradient>
-                <filter id="cnhl-glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity="0.75"/>
-                    <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#84cc16" flood-opacity="0.3"/>
-                </filter>
-            </defs>
-            <rect width="512" height="512" rx="115" fill="url(#cnhl-bg)"/>
-            <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#84cc16" stroke-opacity="0.25" stroke-width="3"/>
-            <g filter="url(#cnhl-glow)">
-                <path d="M 220 135 C 210 70, 270 65, 295 55" stroke="#ef4444" stroke-width="20" fill="none" stroke-linecap="round"/>
-                <path d="M 185 135 C 175 55, 235 50, 260 40" stroke="#3f3f46" stroke-width="20" fill="none" stroke-linecap="round"/>
-                <rect x="275" y="28" width="58" height="40" rx="8" fill="url(#xt60-grad)" transform="rotate(-15 300 48)"/>
-                <path d="M 320 135 C 330 95, 360 90, 370 75" stroke="#e4e4e7" stroke-width="9" fill="none"/>
-                <rect x="360" y="55" width="24" height="30" rx="4" fill="#ffffff" transform="rotate(12 372 70)"/>
-                <rect x="110" y="125" width="292" height="310" rx="26" fill="url(#pack-body)"/>
-                <rect x="110" y="125" width="292" height="48" rx="26" fill="#18181b"/>
-                <rect x="110" y="150" width="292" height="23" fill="#18181b"/>
-                <line x1="110" y1="173" x2="402" y2="173" stroke="#27272a" stroke-width="2"/>
-                <path d="M 110 210 L 402 180 L 402 225 L 110 255 Z" fill="url(#cnhl-green)"/>
-                <rect x="126" y="240" width="260" height="175" rx="14" fill="#000000" fill-opacity="0.8" stroke="#27272a" stroke-width="1.5"/>
-                <text x="145" y="286" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="36" letter-spacing="2">CNHL</text>
-                <rect x="285" y="252" width="82" height="42" rx="8" fill="url(#cnhl-green)"/>
-                <text x="326" y="283" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="26" text-anchor="middle">G+</text>
-                <text x="145" y="325" fill="#84cc16" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="18" letter-spacing="1">GRAPHENE</text>
-                <text x="145" y="358" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="28" letter-spacing="1">70C / 140C</text>
-                <text x="365" y="390" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="16" text-anchor="end">4S LiPo</text>
-            </g>
-        </svg>`;
-
-        document.getElementById('headerIcon').innerHTML = cnhlGPlusIcon;
-
-        (function generateAppIcons() {
-            const blob = new Blob([cnhlGPlusIcon], {type: 'image/svg+xml;charset=utf-8'});
-            const url = URL.createObjectURL(blob);
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = 512;
-                canvas.height = 512;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const pngUrl = canvas.toDataURL('image/png');
-                document.getElementById('appleTouchIcon').href = pngUrl;
-                document.getElementById('favicon').href = pngUrl;
-                URL.revokeObjectURL(url);
-            };
-            img.src = url;
-        })();
-
-        // --- STATE & DATA ---
-        let batteries = [];
-        try {
-            batteries = JSON.parse(localStorage.getItem('lipo_batteries_db')) || [];
-        } catch (e) {}
-
-        let editingId = null;
-
-        function toggleTool(panelId) {
-            const p = document.getElementById(panelId);
-            p.style.display = (p.style.display === 'block') ? 'none' : 'block';
-        }
-
-        function calcParallel() {
-            const cap = parseFloat(document.getElementById('pCap').value) || 0;
-            const count = parseFloat(document.getElementById('pCount').value) || 0;
-            const rate = parseFloat(document.getElementById('pRate').value) || 0;
-            const res = ((cap / 1000) * count * rate).toFixed(1);
-            document.getElementById('pResult').innerText = `${res} A`;
-        }
-
-        function toggleForm() {
-            const card = document.getElementById('formCard');
-            if (card.style.display === 'none' || card.style.display === '') showForm();
-            else hideForm();
-        }
-
-        function showForm() {
-            const card = document.getElementById('formCard');
-            card.style.display = 'block';
-            document.getElementById('toggleFormBtn').classList.add('active');
-            document.getElementById('addIconSymbol').innerText = '✕';
-            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function hideForm() {
-            cancelEdit();
-            const card = document.getElementById('formCard');
-            card.style.display = 'none';
-            document.getElementById('toggleFormBtn').classList.remove('active');
-            document.getElementById('addIconSymbol').innerText = '＋';
-        }
-
-        function setManufacturer(name) {
-            document.getElementById('manufacturer').value = name;
-        }
-
-        function formatDischarge(val) {
-            if (!val) return '-';
-            let str = String(val).trim();
-            return str.toLowerCase().endsWith('c') ? str : str + 'C';
-        }
-
-        // AKKUALTER BERECHNEN
-        function calculateAge(dateStr) {
-            if (!dateStr) return null;
-            const pDate = new Date(dateStr);
-            if (isNaN(pDate.getTime())) return null;
-            const now = new Date();
-            
-            let months = (now.getFullYear() - pDate.getFullYear()) * 12 + (now.getMonth() - pDate.getMonth());
-            if (now.getDate() < pDate.getDate()) months--;
-            
-            if (months < 0) return 'Neu';
-            if (months === 0) return '< 1 Mon.';
-            if (months < 12) return `${months} Mon.`;
-            
-            const years = (months / 12).toFixed(1);
-            return `${years.replace('.', ',')} J.`;
-        }
-
-        document.getElementById('lipoForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const batteryData = {
-                manufacturer: document.getElementById('manufacturer').value.trim() || "-",
-                type: document.getElementById('type').value,
-                status: document.getElementById('status').value,
-                capacity: parseInt(document.getElementById('capacity').value),
-                cellCount: parseInt(document.getElementById('cellCount').value),
-                qty: parseInt(document.getElementById('qty').value) || 1,
-                cycles: parseInt(document.getElementById('cycles').value) || 0,
-                chargeRate: parseFloat(document.getElementById('chargeRate').value),
-                dischargeRate: document.getElementById('dischargeRate').value.trim(),
-                weight: parseFloat(document.getElementById('weight').value),
-                purchaseDate: document.getElementById('purchaseDate').value || ""
-            };
-
-            if (editingId !== null) {
-                const index = batteries.findIndex(b => b.id === editingId);
-                if (index !== -1) batteries[index] = { id: editingId, ...batteryData };
-            } else {
-                batteries.push({ id: Date.now(), ...batteryData });
-            }
-
-            saveAndRender();
-            hideForm();
-        });
-
-        function incrementCycle(id) {
-            const b = batteries.find(item => item.id === id);
-            if (b) {
-                b.cycles = (b.cycles || 0) + 1;
-                saveAndRender();
-            }
-        }
-
-        function editBattery(id) {
-            const b = batteries.find(item => item.id === id);
-            if (!b) return;
-
-            editingId = id;
-            document.getElementById('manufacturer').value = b.manufacturer === '-' ? '' : b.manufacturer;
-            document.getElementById('type').value = b.type;
-            document.getElementById('status').value = b.status || 'ready';
-            document.getElementById('capacity').value = b.capacity;
-            document.getElementById('cellCount').value = b.cellCount;
-            document.getElementById('qty').value = b.qty || 1;
-            document.getElementById('cycles').value = b.cycles || 0;
-            document.getElementById('weight').value = b.weight;
-            document.getElementById('chargeRate').value = b.chargeRate;
-            document.getElementById('dischargeRate').value = b.dischargeRate || '';
-            document.getElementById('purchaseDate').value = b.purchaseDate;
-
-            document.getElementById('formTitle').innerText = "✏️ Akku bearbeiten";
-            document.getElementById('submitBtn').innerText = "Änderung Speichern";
-            showForm();
-        }
-
-        function cancelEdit() {
-            editingId = null;
-            document.getElementById('lipoForm').reset();
-            document.getElementById('type').value = "LiPo";
-            document.getElementById('status').value = "ready";
-            document.getElementById('qty').value = "1";
-            document.getElementById('cycles').value = "0";
-            document.getElementById('formTitle').innerText = "➕ Neuen Akku hinzufügen";
-            document.getElementById('submitBtn').innerText = "Akku Speichern";
-        }
-
-        function deleteBattery(id) {
-            if (confirm("Möchtest du diesen Akku wirklich löschen?")) {
-                batteries = batteries.filter(b => b.id !== id);
-                if (editingId === id) cancelEdit();
-                saveAndRender();
-            }
-        }
-
-        function saveAndRender() {
-            try {
-                localStorage.setItem('lipo_batteries_db', JSON.stringify(batteries));
-            } catch (e) {}
-            render();
-        }
-
-        function exportData() {
-            if (!batteries.length) return alert("Keine Akkus zum Exportieren vorhanden.");
-            const blob = new Blob([JSON.stringify(batteries, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `rogers_akkus_backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }
-
-        function importData(event) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported) && imported.every(i => i.capacity && i.cellCount)) {
-                        batteries = imported;
-                        saveAndRender();
-                        alert("Backup erfolgreich geladen!");
-                    } else {
-                        alert("Ungültiges Backup-Dateiformat.");
-                    }
-                } catch (err) {
-                    alert("Fehler beim Lesen der Datei.");
-                }
-            };
-            if (event.target.files[0]) reader.readAsText(event.target.files[0]);
-        }
-
-        function getTypeClass(type) {
-            switch(type) {
-                case 'LiHV': return 'type-lihv';
-                case 'LiFe': return 'type-life';
-                case 'LiIon': return 'type-liion';
-                default: return 'type-lipo';
-            }
-        }
-
-        function getStatusBadge(status) {
-            switch(status) {
-                case 'storage': return '<span class="status-badge status-storage">Storage</span>';
-                case 'retired': return '<span class="status-badge status-retired">Defekt</span>';
-                default: return '<span class="status-badge status-ready">Flugbereit</span>';
-            }
-        }
-
-        function updateStats() {
-            let totalCount = 0;
-            let totalCapMah = 0;
-            let totalWeightG = 0;
-
-            batteries.forEach(b => {
-                const qty = b.qty || 1;
-                totalCount += qty;
-                totalCapMah += (b.capacity * qty);
-                totalWeightG += (b.weight * qty);
-            });
-
-            document.getElementById('statCount').innerText = totalCount;
-            document.getElementById('statCapacity').innerText = (totalCapMah / 1000).toFixed(1) + " Ah";
-            document.getElementById('statWeight').innerText = (totalWeightG >= 1000) ? (totalWeightG / 1000).toFixed(2) + " kg" : Math.round(totalWeightG) + " g";
-        }
-
-        function render() {
-            updateStats();
-            const listDiv = document.getElementById('batteryList');
-            const filterText = document.getElementById('searchInput').value.toLowerCase().trim();
-            listDiv.innerHTML = '';
-
-            const filteredBatteries = batteries.filter(b => {
-                const searchStr = `${b.manufacturer} ${b.type} ${b.capacity} ${b.cellCount}s`.toLowerCase();
-                return searchStr.includes(filterText);
-            });
-
-            const grouped = {};
-            filteredBatteries.forEach(b => {
-                if (!grouped[b.cellCount]) grouped[b.cellCount] = [];
-                grouped[b.cellCount].push(b);
-            });
-
-            const sortedCells = Object.keys(grouped).map(Number).sort((a, b) => a - b);
-
-            if (sortedCells.length === 0) {
-                listDiv.innerHTML = `
-                    <div class="empty-state">
-                        <div style="font-size: 36px; margin-bottom: 8px;">🔋</div>
-                        <p style="margin: 0; font-weight: 600; color: var(--text-dark);">Keine Akkus gefunden</p>
-                        <p style="margin: 4px 0 0 0; font-size: 13px;">Tippe auf das Plus oben, um einen Akku hinzuzufügen.</p>
-                        <button class="btn-empty-add" onclick="showForm()">➕ Akku hinzufügen</button>
-                    </div>
-                `;
-                return;
-            }
-
-            sortedCells.forEach(cell => {
-                const cellGroup = grouped[cell];
-                const totalCellPacks = cellGroup.reduce((acc, curr) => acc + (curr.qty || 1), 0);
-
-                const section = document.createElement('div');
-                section.className = 'section-header';
-                section.innerHTML = `
-                    <span>${cell}S Akkus</span>
-                    <span class="section-badge">${totalCellPacks} Pack${totalCellPacks > 1 ? 's' : ''}</span>
-                `;
-                listDiv.appendChild(section);
-
-                const container = document.createElement('div');
-                container.className = 'table-container';
-
-                container.innerHTML = cellGroup.map(b => {
-                    const chargeAmps = ((b.capacity / 1000) * b.chargeRate).toFixed(1);
-                    const qty = b.qty || 1;
-                    const cycles = b.cycles || 0;
-                    const ageStr = calculateAge(b.purchaseDate);
-
-                    return `
-                    <div class="battery-item">
-                        <div class="battery-main-row">
-                            <div class="akku-title">
-                                ${qty > 1 ? `<span class="qty-badge">${qty}x</span>` : ''}
-                                <span class="type-badge ${getTypeClass(b.type)}">${b.type}</span>
-                                ${getStatusBadge(b.status)}
-                                ${b.manufacturer && b.manufacturer !== '-' ? `<span class="manufacturer-tag">${b.manufacturer}</span>` : ''}
-                                <span class="cap-tag">${b.capacity} mAh</span>
-                            </div>
-                            <div class="action-btns">
-                                <button class="btn-action btn-edit" onclick="editBattery(${b.id})" title="Bearbeiten">✏️</button>
-                                <button class="btn-action btn-del" onclick="deleteBattery(${b.id})" title="Löschen">✕</button>
-                            </div>
-                        </div>
-
-                        <div class="battery-data-row">
-                            <span class="charge-amp-highlight">⚡ ${chargeAmps} A (${b.chargeRate}C)</span>
-                            <span class="data-badge">💥 <strong>${formatDischarge(b.dischargeRate)}</strong></span>
-                            <span class="data-badge">⚖️ <strong>${b.weight}g</strong></span>
-                            
-                            <span class="data-badge">
-                                🔄 <strong>${cycles} Zyklen</strong>
-                                <button class="cycle-btn" onclick="incrementCycle(${b.id})" title="1 Zyklus hinzufügen">+1</button>
-                            </span>
-
-                            ${ageStr ? `<span class="data-badge">⏳ <strong>${ageStr} alt</strong></span>` : ''}
-                        </div>
-                    </div>
-                `}).join('');
-
-                listDiv.appendChild(container);
-            });
-        }
-
-        render();
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(() => {});
-            });
-        }
-    </script>
+      </div>
+
+      <button type="submit" class="submit-btn">Akku Speichern</button>
+    </form>
+  </div>
+
+  <!-- Schnell-Filter -->
+  <div class="filter-group" id="filterBar">
+    <button class="filter-btn active" onclick="filterList('ALL', this)">Alle</button>
+    <button class="filter-btn" onclick="filterList('1S', this)">1S</button>
+    <button class="filter-btn" onclick="filterList('2S', this)">2S</button>
+    <button class="filter-btn" onclick="filterList('3S', this)">3S</button>
+    <button class="filter-btn" onclick="filterList('4S', this)">4S</button>
+    <button class="filter-btn" onclick="filterList('6S', this)">6S</button>
+  </div>
+
+  <!-- Akku Liste -->
+  <div id="lipoList"></div>
+
+  <script>
+    let liposafe = JSON.parse(localStorage.getItem('lipos')) || [];
+    let currentFilter = 'ALL';
+
+    const form = document.getElementById('lipoForm');
+    const lipoList = document.getElementById('lipoList');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newLipo = {
+        id: Date.now(),
+        name: document.getElementById('name').value,
+        cells: document.getElementById('cells').value,
+        capacity: document.getElementById('capacity').value
+      };
+      liposafe.push(newLipo);
+      saveAndRender();
+      form.reset();
+    });
+
+    function saveAndRender() {
+      localStorage.setItem('lipos', JSON.stringify(liposafe));
+      render();
+    }
+
+    function deleteLipo(id) {
+      liposafe = liposafe.filter(item => item.id !== id);
+      saveAndRender();
+    }
+
+    function filterList(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    }
+
+    function render() {
+      lipoList.innerHTML = '';
+      const filtered = liposafe.filter(item => currentFilter === 'ALL' || item.cells === currentFilter);
+
+      if (filtered.length === 0) {
+        lipoList.innerHTML = '<div style="text-align:center; color: var(--subtext); padding: 20px;">Keine Akkus vorhanden.</div>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'lipo-item';
+        div.innerHTML = `
+          <div>
+            <div class="lipo-title">${item.name}</div>
+            <div class="lipo-sub">${item.cells} • ${item.capacity} mAh</div>
+          </div>
+          <button class="delete-btn" onclick="deleteLipo(${item.id})">✕</button>
+        `;
+        lipoList.appendChild(div);
+      });
+    }
+
+    render();
+  </script>
 </body>
 </html>
