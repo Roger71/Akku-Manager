@@ -126,7 +126,7 @@
             transform: rotate(90deg);
         }
 
-        /* TOP CHEAT SHEET BUTTON */
+        /* SPICKZETTEL BUTTON */
         .btn-cheat-toggle {
             width: 100%;
             background: var(--card-bg);
@@ -150,7 +150,7 @@
             background: #e5e5ea;
         }
 
-        /* VOLTAGE CHEAT SHEET CARD */
+        /* SPICKZETTEL CARD */
         .cheat-card {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
@@ -467,6 +467,14 @@
             flex-wrap: wrap;
         }
 
+        /* EINE ZEILE FÜR HERSTELLER + KAPAZITÄT */
+        .mfg-cap-line {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
         /* BADGES */
         .type-badge {
             font-size: 11px;
@@ -488,7 +496,6 @@
             border-radius: 6px;
             text-transform: uppercase;
         }
-        .status-ready { background: var(--success-light); color: #15803d; }
         .status-storage { background: var(--warning-light); color: #b45309; }
         .status-retired { background: var(--danger-light); color: var(--danger); }
 
@@ -502,7 +509,7 @@
         }
 
         .manufacturer-tag {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             color: #334155;
         }
@@ -751,7 +758,7 @@
                 <div class="form-group">
                     <label>Status</label>
                     <select id="status">
-                        <option value="ready" selected>🟢 Flugbereit</option>
+                        <option value="ready" selected>Einsatzbereit</option>
                         <option value="storage">🟡 Storage</option>
                         <option value="retired">🔴 Ausgemustert</option>
                     </select>
@@ -892,11 +899,7 @@
 
         function toggleCheatSheet() {
             const card = document.getElementById('cheatCard');
-            if (card.style.display === 'none' || card.style.display === '') {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
+            card.style.display = (card.style.display === 'none' || card.style.display === '') ? 'block' : 'none';
         }
 
         function toggleForm() {
@@ -1124,26 +1127,28 @@
                 groupBatteries.forEach(b => {
                     const chargeAmp = ((b.capacity * (b.chargeRate || 1)) / 1000).toFixed(1);
                     const typeClass = `type-${(b.type || 'lipo').toLowerCase()}`;
-                    let statusLabel = '🟢 Flugbereit';
-                    let statusClass = 'status-ready';
-
+                    
+                    // STATUS BADGES: Flugbereit wird bewusst ausgeblendet
+                    let statusBadgeHtml = '';
                     if (b.status === 'storage') {
-                        statusLabel = '🟡 Storage';
-                        statusClass = 'status-storage';
+                        statusBadgeHtml = `<span class="status-badge status-storage">🟡 Storage</span>`;
                     } else if (b.status === 'retired') {
-                        statusLabel = '🔴 Ausgemustert';
-                        statusClass = 'status-retired';
+                        statusBadgeHtml = `<span class="status-badge status-retired">🔴 Ausgemustert</span>`;
                     }
+
+                    const hasMfg = b.manufacturer && b.manufacturer !== '-';
 
                     html += `
                         <div class="battery-item">
                             <div class="battery-main-row">
                                 <div class="akku-title">
                                     <span class="type-badge ${typeClass}">${b.type}</span>
-                                    <span class="status-badge ${statusClass}">${statusLabel}</span>
                                     ${b.qty > 1 ? `<span class="qty-badge">${b.qty}x</span>` : ''}
-                                    <span class="manufacturer-tag">${b.manufacturer !== '-' ? b.manufacturer : ''}</span>
-                                    <span class="cap-tag">${b.capacity} mAh</span>
+                                    <span class="mfg-cap-line">
+                                        ${hasMfg ? `<span class="manufacturer-tag">${b.manufacturer}</span>` : ''}
+                                        <span class="cap-tag">${b.capacity} mAh</span>
+                                    </span>
+                                    ${statusBadgeHtml}
                                 </div>
                                 <div class="action-btns">
                                     <button class="btn-action btn-edit" onclick="editBattery(${b.id})" title="Bearbeiten">✏️</button>
