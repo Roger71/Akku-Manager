@@ -29,7 +29,7 @@
             --radius-md: 12px;
             --radius-sm: 8px;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
         }
 
         * {
@@ -50,76 +50,136 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* HEADER SECTION - HORIZONTAL LAYOUT */
+        /* HEADER SECTION WITH TOP PLUS BUTTON */
         header {
             display: flex;
             align-items: center;
-            gap: 14px;
-            margin: 8px 4px 20px 4px;
+            justify-content: space-between;
+            margin: 8px 4px 16px 4px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .header-icon-box {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             flex-shrink: 0;
-            border-radius: 14px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 0 10px rgba(132, 204, 22, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             background: #121318;
             overflow: hidden;
-            -webkit-backface-visibility: hidden;
             transform: translateZ(0);
         }
 
         .header-icon-box svg {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             display: block;
         }
 
-        .header-text {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
         .header-text h1 {
-            font-size: 21px;
+            font-size: 19px;
             font-weight: 800;
             letter-spacing: -0.4px;
             margin: 0 0 2px 0;
             color: var(--text-dark);
-            line-height: 1.15;
+            line-height: 1.1;
         }
 
         .header-text p {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
             margin: 0;
             font-weight: 500;
         }
 
-        /* CARDS */
-        .card {
+        /* HEADER ADD BUTTON */
+        .btn-add-header {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 400;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.35);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-add-header:active {
+            transform: scale(0.9);
+        }
+
+        .btn-add-header.active {
+            background: #e5e5ea;
+            color: var(--text-dark);
+            box-shadow: none;
+            transform: rotate(90deg);
+        }
+
+        /* COLLAPSIBLE FORM CARD */
+        .form-card {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
             padding: 18px;
             margin-bottom: 20px;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
+            display: none; /* Standardmäßig ausgeblendet */
+            animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
         }
 
         .card-title {
             font-size: 16px;
             font-weight: 700;
-            margin-top: 0;
-            margin-bottom: 16px;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .btn-close-form {
+            background: #f2f2f7;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            letter-spacing: -0.3px;
+            justify-content: center;
+            font-weight: bold;
         }
 
         /* FORM STYLES */
@@ -241,9 +301,9 @@
 
         /* SECTION LIST HEADERS */
         .section-header {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
-            margin: 24px 0 10px 4px;
+            margin: 18px 0 8px 4px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -378,6 +438,18 @@
             border: 1px solid var(--border-color);
         }
 
+        .btn-empty-add {
+            margin-top: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
         /* BACKUP FOOTER BAR */
         .backup-bar {
             background: var(--card-bg);
@@ -424,15 +496,25 @@
 <body>
 
     <header>
-        <div class="header-icon-box" id="headerIcon"></div>
-        <div class="header-text">
-            <h1>Roger’s Akku Manager</h1>
-            <p>Akkus einfach & präzise verwalten</p>
+        <div class="header-left">
+            <div class="header-icon-box" id="headerIcon"></div>
+            <div class="header-text">
+                <h1>Roger’s Akku Manager</h1>
+                <p>Akkus einfach & präzise verwalten</p>
+            </div>
         </div>
+        <button class="btn-add-header" id="toggleFormBtn" onclick="toggleForm()" aria-label="Neuer Akku">
+            <span id="addIconSymbol">＋</span>
+        </button>
     </header>
 
-    <div class="card" id="formCard">
-        <h3 class="card-title" id="formTitle">➕ Neuen Akku hinzufügen</h3>
+    <!-- AUSKLAPPBARES EINGABEFORMULAR -->
+    <div class="form-card" id="formCard">
+        <div class="form-header">
+            <h3 class="card-title" id="formTitle">➕ Neuen Akku hinzufügen</h3>
+            <button type="button" class="btn-close-form" onclick="hideForm()">✕</button>
+        </div>
+        
         <form id="lipoForm">
             <div class="grid-form">
                 <div class="form-group full-width">
@@ -494,14 +576,16 @@
             </div>
 
             <div class="form-actions">
-                <button type="button" class="btn-cancel" id="cancelBtn" style="display:none;" onclick="cancelEdit()">Abbrechen</button>
+                <button type="button" class="btn-cancel" onclick="hideForm()">Abbrechen</button>
                 <button type="submit" class="btn-add" id="submitBtn">Akku Speichern</button>
             </div>
         </form>
     </div>
 
+    <!-- AKKU LISTE ALS ERSTES SICHTBAR -->
     <div id="batteryList"></div>
 
+    <!-- BACKUP FOOTER BAR -->
     <div class="backup-bar">
         <span class="backup-title">💾 Datensicherung</span>
         <div class="backup-actions">
@@ -541,52 +625,28 @@
             <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#84cc16" stroke-opacity="0.25" stroke-width="3"/>
             
             <g filter="url(#cnhl-glow)">
-                <!-- Power Cable Red AWG -->
                 <path d="M 220 135 C 210 70, 270 65, 295 55" stroke="#ef4444" stroke-width="20" fill="none" stroke-linecap="round"/>
-                <!-- Power Cable Black AWG -->
                 <path d="M 185 135 C 175 55, 235 50, 260 40" stroke="#3f3f46" stroke-width="20" fill="none" stroke-linecap="round"/>
-                
-                <!-- XT60 Plug -->
                 <rect x="275" y="28" width="58" height="40" rx="8" fill="url(#xt60-grad)" transform="rotate(-15 300 48)"/>
-                
-                <!-- Balance Cable JST-XH -->
                 <path d="M 320 135 C 330 95, 360 90, 370 75" stroke="#e4e4e7" stroke-width="9" fill="none"/>
                 <rect x="360" y="55" width="24" height="30" rx="4" fill="#ffffff" transform="rotate(12 372 70)"/>
-
-                <!-- Main Pack -->
                 <rect x="110" y="125" width="292" height="310" rx="26" fill="url(#pack-body)"/>
-                
-                <!-- Top Cap -->
                 <rect x="110" y="125" width="292" height="48" rx="26" fill="#18181b"/>
                 <rect x="110" y="150" width="292" height="23" fill="#18181b"/>
                 <line x1="110" y1="173" x2="402" y2="173" stroke="#27272a" stroke-width="2"/>
-
-                <!-- Signature Green Diagonal Stripe -->
                 <path d="M 110 210 L 402 180 L 402 225 L 110 255 Z" fill="url(#cnhl-green)"/>
-                
-                <!-- Label Container -->
                 <rect x="126" y="240" width="260" height="175" rx="14" fill="#000000" fill-opacity="0.8" stroke="#27272a" stroke-width="1.5"/>
-
-                <!-- CNHL Text Logo -->
                 <text x="145" y="286" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="36" letter-spacing="2">CNHL</text>
-                
-                <!-- G+ Badge -->
                 <rect x="285" y="252" width="82" height="42" rx="8" fill="url(#cnhl-green)"/>
                 <text x="326" y="283" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="26" text-anchor="middle">G+</text>
-
-                <!-- Specs Callout -->
                 <text x="145" y="325" fill="#84cc16" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="18" letter-spacing="1">GRAPHENE</text>
                 <text x="145" y="358" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="28" letter-spacing="1">70C / 140C</text>
-                
-                <!-- Cell Info -->
                 <text x="365" y="390" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="16" text-anchor="end">4S LiPo</text>
             </g>
         </svg>`;
 
-        // Render in Header Box
         document.getElementById('headerIcon').innerHTML = cnhlGPlusIcon;
 
-        // Generate dynamic PNG for iOS Touch Icon and Favicon
         (function generateAppIcons() {
             const blob = new Blob([cnhlGPlusIcon], {type: 'image/svg+xml;charset=utf-8'});
             const url = URL.createObjectURL(blob);
@@ -614,6 +674,32 @@
         }
 
         let editingId = null;
+
+        // FORM TOGGLE LOGIC
+        function toggleForm() {
+            const card = document.getElementById('formCard');
+            if (card.style.display === 'none' || card.style.display === '') {
+                showForm();
+            } else {
+                hideForm();
+            }
+        }
+
+        function showForm() {
+            const card = document.getElementById('formCard');
+            card.style.display = 'block';
+            document.getElementById('toggleFormBtn').classList.add('active');
+            document.getElementById('addIconSymbol').innerText = '✕';
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function hideForm() {
+            cancelEdit();
+            const card = document.getElementById('formCard');
+            card.style.display = 'none';
+            document.getElementById('toggleFormBtn').classList.remove('active');
+            document.getElementById('addIconSymbol').innerText = '＋';
+        }
 
         function setManufacturer(name) {
             document.getElementById('manufacturer').value = name;
@@ -652,7 +738,7 @@
             }
 
             saveAndRender();
-            cancelEdit();
+            hideForm();
         });
 
         function editBattery(id) {
@@ -671,9 +757,8 @@
 
             document.getElementById('formTitle').innerText = "✏️ Akku bearbeiten";
             document.getElementById('submitBtn').innerText = "Änderung Speichern";
-            document.getElementById('cancelBtn').style.display = "block";
 
-            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+            showForm();
         }
 
         function cancelEdit() {
@@ -682,7 +767,6 @@
             document.getElementById('type').value = "LiPo";
             document.getElementById('formTitle').innerText = "➕ Neuen Akku hinzufügen";
             document.getElementById('submitBtn').innerText = "Akku Speichern";
-            document.getElementById('cancelBtn').style.display = "none";
         }
 
         function deleteBattery(id) {
@@ -777,7 +861,8 @@
                     <div class="empty-state">
                         <div style="font-size: 36px; margin-bottom: 8px;">🔋</div>
                         <p style="margin: 0; font-weight: 600; color: #1c1c1e;">Keine Akkus eingetragen</p>
-                        <p style="margin: 4px 0 0 0; font-size: 13px;">Füge oben deinen ersten Akku hinzu.</p>
+                        <p style="margin: 4px 0 0 0; font-size: 13px;">Tippe auf das Plus oben, um deinen ersten Akku hinzuzufügen.</p>
+                        <button class="btn-empty-add" onclick="showForm()">➕ Akku hinzufügen</button>
                     </div>
                 `;
                 return;
