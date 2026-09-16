@@ -6,13 +6,14 @@
   <title>LiPo-Manager</title>
   <style>
     :root {
-      --bg: #121212;
-      --card: #1e1e1e;
-      --accent: #0a84ff;
-      --text: #ffffff;
-      --subtext: #a0a0a0;
-      --border: #2c2c2e;
-      --red: #ff453a;
+      --bg: #f2f2f7;
+      --card: #ffffff;
+      --accent: #007aff;
+      --text: #000000;
+      --subtext: #6c6c70;
+      --border: #e5e5ea;
+      --input-bg: #e5e5ea;
+      --red: #ff3b30;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -29,6 +30,7 @@
       padding: 16px;
       margin-bottom: 16px;
       border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     label { display: block; font-size: 12px; color: var(--subtext); margin-top: 8px; }
     input, select {
@@ -37,8 +39,8 @@
       margin-top: 4px;
       border-radius: 8px;
       border: 1px solid var(--border);
-      background: #2c2c2e;
-      color: #fff;
+      background: var(--input-bg);
+      color: var(--text);
       font-size: 16px;
       box-sizing: border-box;
     }
@@ -62,7 +64,7 @@
       margin-bottom: 12px;
     }
     .filter-btn {
-      background: #2c2c2e;
+      background: #e5e5ea;
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 14px;
@@ -74,6 +76,7 @@
     .filter-btn.active {
       background: var(--accent);
       border-color: var(--accent);
+      color: #ffffff;
     }
     .lipo-item {
       background: var(--card);
@@ -84,6 +87,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
     }
     .lipo-title { font-weight: bold; font-size: 16px; }
     .lipo-sub { font-size: 13px; color: var(--subtext); margin-top: 2px; }
