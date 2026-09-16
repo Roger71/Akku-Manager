@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LiPo-Manager</title>
+  <title>LiPo-Manager Pro</title>
   <style>
     :root {
       --bg: #f2f2f7;
@@ -12,10 +12,19 @@
       --text: #000000;
       --subtext: #6c6c70;
       --border: #e5e5ea;
-      --input-bg: #f2f2f7;
+      --input-bg: #e5e5ea;
       --red: #ff3b30;
       --green: #34c759;
       --orange: #ff9500;
+    }
+    [data-theme="dark"] {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --accent: #0a84ff;
+      --text: #ffffff;
+      --subtext: #a0a0a0;
+      --border: #2c2c2e;
+      --input-bg: #2c2c2e;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -25,17 +34,52 @@
       padding: 16px;
       -webkit-user-select: none;
     }
-    h1 { font-size: 24px; margin-bottom: 16px; font-weight: 700; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    h1 { font-size: 24px; margin: 0; font-weight: 700; }
+    .theme-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: var(--card);
+      padding: 10px 6px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .stat-val { font-size: 18px; font-weight: bold; }
+    .stat-lbl { font-size: 11px; color: var(--subtext); margin-top: 2px; }
+
     .card {
       background: var(--card);
       border-radius: 12px;
       padding: 16px;
       margin-bottom: 16px;
       border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    details summary {
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
     }
     label { display: block; font-size: 12px; color: var(--subtext); margin-top: 8px; font-weight: 600; }
-    input, select {
+    input, select, textarea {
       width: 100%;
       padding: 10px;
       margin-top: 4px;
@@ -46,6 +90,9 @@
       font-size: 15px;
       box-sizing: border-box;
     }
+    .row { display: flex; gap: 8px; }
+    .col { flex: 1; }
+
     button.submit-btn {
       width: 100%;
       background: var(--accent);
@@ -58,9 +105,10 @@
       margin-top: 14px;
       cursor: pointer;
     }
+    
     .filter-group {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       overflow-x: auto;
       padding-bottom: 8px;
       margin-bottom: 8px;
@@ -69,144 +117,314 @@
       background: var(--card);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 8px 14px;
-      border-radius: 16px;
+      padding: 6px 12px;
+      border-radius: 14px;
       font-size: 13px;
       white-space: nowrap;
       cursor: pointer;
-      font-weight: 500;
     }
     .filter-btn.active {
       background: var(--accent);
       border-color: var(--accent);
       color: #ffffff;
     }
+
     .lipo-item {
       background: var(--card);
       border-radius: 12px;
       padding: 14px 16px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       border: 1px solid var(--border);
+    }
+    .lipo-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
-    .lipo-title { font-weight: 600; font-size: 16px; }
-    .lipo-sub { font-size: 13px; color: var(--subtext); margin-top: 3px; }
+    .lipo-title { font-weight: 700; font-size: 16px; }
+    .lipo-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 12px;
+      font-size: 13px;
+      margin-top: 10px;
+      color: var(--subtext);
+    }
+    .lipo-details strong { color: var(--text); }
+    
     .badge {
-      padding: 5px 10px;
-      border-radius: 8px;
+      padding: 4px 8px;
+      border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      user-select: none;
     }
-    .status-storage { background: rgba(255, 149, 0, 0.15); color: var(--orange); }
-    .status-charged { background: rgba(52, 199, 89, 0.15); color: var(--green); }
-    .status-discharged { background: rgba(255, 59, 48, 0.15); color: var(--red); }
-    .delete-btn {
-      background: transparent;
-      color: var(--red);
-      border: none;
-      font-size: 18px;
+    .status-storage { background: rgba(255, 149, 0, 0.2); color: var(--orange); }
+    .status-charged { background: rgba(52, 199, 89, 0.2); color: var(--green); }
+    .status-discharged { background: rgba(255, 59, 48, 0.2); color: var(--red); }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+    .btn-small {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
       cursor: pointer;
-      padding: 4px 8px;
-      margin-left: 4px;
     }
+    .btn-danger { color: var(--red); }
   </style>
 </head>
 <body>
 
-  <h1>LiPo-Manager</h1>
-
-  <!-- Akku Hinzufügen -->
-  <div class="card">
-    <strong style="font-size: 16px;">Neuen Akku anlegen</strong>
-    <form id="lipoForm">
-      <label>Bezeichnung / Name</label>
-      <input type="text" id="name" placeholder="z. B. Turnigy Rapid 6S" required>
-
-      <div style="display: flex; gap: 8px;">
-        <div style="flex: 1;">
-          <label>Zellen (S)</label>
-          <select id="cells">
-            <option value="1S">1S</option>
-            <option value="2S">2S</option>
-            <option value="3S">3S</option>
-            <option value="4S">4S</option>
-            <option value="6S" selected>6S</option>
-            <option value="8S">8S</option>
-          </select>
-        </div>
-        <div style="flex: 1;">
-          <label>Kapazität (mAh)</label>
-          <input type="number" id="capacity" placeholder="7000" required>
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 8px;">
-        <div style="flex: 1;">
-          <label>C-Rate (optional)</label>
-          <input type="text" id="crate" placeholder="z. B. 60C">
-        </div>
-        <div style="flex: 1;">
-          <label>Ladezustand</label>
-          <select id="status">
-            <option value="Storage">Lagerspannung</option>
-            <option value="Geladen">Voll Geladen</option>
-            <option value="Entladen">Entladen</option>
-          </select>
-        </div>
-      </div>
-
-      <label>Modell / Notiz (optional)</label>
-      <input type="text" id="model" placeholder="z. B. Super Tucano / Heli">
-
-      <button type="submit" class="submit-btn">Akku Speichern</button>
-    </form>
+  <div class="header">
+    <h1>LiPo-Manager</h1>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
   </div>
 
-  <!-- Suche & Schnell-Filter -->
-  <input type="text" id="search" placeholder="🔍 Akkus durchsuchen..." oninput="render()" style="margin-bottom: 12px; background: var(--card);">
+  <!-- Statistik Übersicht -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" id="stTotal">0</div><div class="stat-lbl">Gesamt</div></div>
+    <div class="stat-card"><div class="stat-val" id="stStorage" style="color:var(--orange)">0</div><div class="stat-lbl">Storage</div></div>
+    <div class="stat-card"><div class="stat-val" id="stCharged" style="color:var(--green)">0</div><div class="stat-lbl">Geladen</div></div>
+    <div class="stat-card"><div class="stat-val" id="stDischarged" style="color:var(--red)">0</div><div class="stat-lbl">Leer</div></div>
+  </div>
+
+  <!-- Akku Hinzufügen Formular -->
+  <div class="card">
+    <details id="addFormDetails">
+      <summary>➕ Neuen Akku anlegen</summary>
+      <form id="lipoForm" style="margin-top: 10px;">
+        <input type="hidden" id="editId">
+        
+        <div class="row">
+          <div class="col" style="flex: 2;">
+            <label>Bezeichnung / Name</label>
+            <input type="text" id="name" placeholder="z. B. Turnigy Rapid 6S" required>
+          </div>
+          <div class="col" style="flex: 1;">
+            <label>ID / Nr.</label>
+            <input type="text" id="number" placeholder="#01">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Zellen (S)</label>
+            <select id="cells">
+              <option value="1S">1S</option>
+              <option value="2S">2S</option>
+              <option value="3S">3S</option>
+              <option value="4S">4S</option>
+              <option value="6S" selected>6S</option>
+              <option value="8S">8S</option>
+              <option value="12S">12S</option>
+            </select>
+          </div>
+          <div class="col">
+            <label>Kapazität (mAh)</label>
+            <input type="number" id="capacity" placeholder="7000" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Entlade C-Rate</label>
+            <input type="text" id="crate" placeholder="z. B. 60C">
+          </div>
+          <div class="col">
+            <label>Max Lade-C</label>
+            <input type="number" id="chargeC" placeholder="z. B. 2" step="0.5" value="2">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Stecker</label>
+            <select id="connector">
+              <option value="XT90">XT90</option>
+              <option value="XT60">XT60</option>
+              <option value="XT30">XT30</option>
+              <option value="EC5 / IC5">EC5 / IC5</option>
+              <option value="EC3 / IC3">EC3 / IC3</option>
+              <option value="Deans / T">Deans</option>
+              <option value="Andere">Andere</option>
+            </select>
+          </div>
+          <div class="col">
+            <label>Ladezustand</label>
+            <select id="status">
+              <option value="Storage">Lagerspannung</option>
+              <option value="Geladen">Voll Geladen</option>
+              <option value="Entladen">Entladen</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Zyklenanzahl</label>
+            <input type="number" id="cycles" value="0">
+          </div>
+          <div class="col">
+            <label>Innenwiderstand (mΩ)</label>
+            <input type="text" id="resistance" placeholder="z. B. 1.2 / Zelle">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Modell / Einsatzzweck</label>
+            <input type="text" id="model" placeholder="z. B. Super Tucano">
+          </div>
+          <div class="col">
+            <label>Kaufdatum</label>
+            <input type="date" id="purchaseDate">
+          </div>
+        </div>
+
+        <label>Notizen / Bemerkung</label>
+        <input type="text" id="notes" placeholder="Optionale Notiz...">
+
+        <button type="submit" class="submit-btn" id="saveBtn">Akku Speichern</button>
+      </form>
+    </details>
+  </div>
+
+  <!-- Lade-Rechner Rechner (Einklappbar) -->
+  <div class="card">
+    <details>
+      <summary>⚡ Lade- & Parallelladerechner</summary>
+      <div style="margin-top: 10px; font-size: 14px;">
+        <div class="row">
+          <div class="col">
+            <label>Kapazität (mAh)</label>
+            <input type="number" id="calcMah" value="5000" oninput="calculateCharge()">
+          </div>
+          <div class="col">
+            <label>Gewünschtes C</label>
+            <input type="number" id="calcC" value="1" step="0.5" oninput="calculateCharge()">
+          </div>
+          <div class="col">
+            <label>Anzahl Akkus</label>
+            <input type="number" id="calcCount" value="1" min="1" oninput="calculateCharge()">
+          </div>
+        </div>
+        <div style="margin-top: 12px; background: var(--input-bg); padding: 12px; border-radius: 8px; text-align: center;">
+          Einzustellender Ladestrom: <strong id="calcResult" style="color: var(--accent); font-size: 18px;">5.0 A</strong>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Suche & Filter & Sortierung -->
+  <input type="text" id="search" placeholder="🔍 Akkus, Modelle oder Stecker durchsuchen..." oninput="render()" style="margin-bottom: 10px;">
 
   <div class="filter-group" id="filterBar">
-    <button class="filter-btn active" onclick="filterList('ALL', this)">Alle</button>
-    <button class="filter-btn" onclick="filterList('1S', this)">1S</button>
-    <button class="filter-btn" onclick="filterList('2S', this)">2S</button>
-    <button class="filter-btn" onclick="filterList('3S', this)">3S</button>
-    <button class="filter-btn" onclick="filterList('4S', this)">4S</button>
-    <button class="filter-btn" onclick="filterList('6S', this)">6S</button>
+    <button class="filter-btn active" onclick="filterCell('ALL', this)">Alle</button>
+    <button class="filter-btn" onclick="filterCell('1S', this)">1S</button>
+    <button class="filter-btn" onclick="filterCell('2S', this)">2S</button>
+    <button class="filter-btn" onclick="filterCell('3S', this)">3S</button>
+    <button class="filter-btn" onclick="filterCell('4S', this)">4S</button>
+    <button class="filter-btn" onclick="filterCell('6S', this)">6S</button>
+    <button class="filter-btn" onclick="filterCell('8S', this)">8S</button>
+  </div>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <div class="col">
+      <select id="statusFilter" onchange="render()">
+        <option value="ALL">Alle Zustände</option>
+        <option value="Storage">Lagerspannung</option>
+        <option value="Geladen">Voll Geladen</option>
+        <option value="Entladen">Entladen</option>
+      </select>
+    </div>
+    <div class="col">
+      <select id="sortBy" onchange="render()">
+        <option value="name">Sortieren: Name</option>
+        <option value="cells">Sortieren: Zellen (S)</option>
+        <option value="capacity">Sortieren: Kapazität</option>
+        <option value="cycles">Sortieren: Zyklen</option>
+      </select>
+    </div>
   </div>
 
   <!-- Akku Liste -->
   <div id="lipoList"></div>
 
+  <!-- Backup & Wiederherstellung -->
+  <div class="card" style="margin-top: 20px;">
+    <details>
+      <summary>💾 Daten-Backup & Verwaltung</summary>
+      <div style="margin-top: 12px; display: flex; gap: 8px;">
+        <button class="btn-small" onclick="exportData()">📥 Exportieren (JSON)</button>
+        <button class="btn-small" onclick="document.getElementById('importFile').click()">📤 Importieren</button>
+        <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+      </div>
+    </details>
+  </div>
+
   <script>
-    let liposafe = JSON.parse(localStorage.getItem('lipos')) || [];
-    let currentFilter = 'ALL';
+    let liposafe = JSON.parse(localStorage.getItem('lipos_pro')) || [];
+    let currentCellFilter = 'ALL';
 
     const form = document.getElementById('lipoForm');
     const lipoList = document.getElementById('lipoList');
 
+    // Theme Switcher
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      document.getElementById('themeBtn').innerText = next === 'dark' ? '☀️ Light' : '🌙 Dark';
+    }
+
+    // Speichern & Rendern
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const newLipo = {
-        id: Date.now(),
+      const editId = document.getElementById('editId').value;
+      
+      const lipoData = {
+        id: editId ? Number(editId) : Date.now(),
         name: document.getElementById('name').value,
+        number: document.getElementById('number').value || '',
         cells: document.getElementById('cells').value,
-        capacity: document.getElementById('capacity').value,
+        capacity: Number(document.getElementById('capacity').value),
         crate: document.getElementById('crate').value || '',
+        chargeC: document.getElementById('chargeC').value || '2',
+        connector: document.getElementById('connector').value,
         status: document.getElementById('status').value,
-        model: document.getElementById('model').value || ''
+        cycles: Number(document.getElementById('cycles').value) || 0,
+        resistance: document.getElementById('resistance').value || '',
+        model: document.getElementById('model').value || '',
+        purchaseDate: document.getElementById('purchaseDate').value || '',
+        notes: document.getElementById('notes').value || ''
       };
-      liposafe.push(newLipo);
+
+      if (editId) {
+        liposafe = liposafe.map(item => item.id === Number(editId) ? lipoData : item);
+        document.getElementById('editId').value = '';
+        document.getElementById('saveBtn').innerText = 'Akku Speichern';
+      } else {
+        liposafe.push(lipoData);
+      }
+
       saveAndRender();
       form.reset();
+      document.getElementById('addFormDetails').open = false;
     });
 
     function saveAndRender() {
-      localStorage.setItem('lipos', JSON.stringify(liposafe));
+      localStorage.setItem('lipos_pro', JSON.stringify(liposafe));
       render();
     }
 
@@ -220,6 +438,38 @@
       }
     }
 
+    function addCycle(id) {
+      const lipo = liposafe.find(item => item.id === id);
+      if (lipo) {
+        lipo.cycles = (lipo.cycles || 0) + 1;
+        saveAndRender();
+      }
+    }
+
+    function editLipo(id) {
+      const lipo = liposafe.find(item => item.id === id);
+      if (!lipo) return;
+
+      document.getElementById('editId').value = lipo.id;
+      document.getElementById('name').value = lipo.name;
+      document.getElementById('number').value = lipo.number || '';
+      document.getElementById('cells').value = lipo.cells;
+      document.getElementById('capacity').value = lipo.capacity;
+      document.getElementById('crate').value = lipo.crate || '';
+      document.getElementById('chargeC').value = lipo.chargeC || '2';
+      document.getElementById('connector').value = lipo.connector;
+      document.getElementById('status').value = lipo.status;
+      document.getElementById('cycles').value = lipo.cycles || 0;
+      document.getElementById('resistance').value = lipo.resistance || '';
+      document.getElementById('model').value = lipo.model || '';
+      document.getElementById('purchaseDate').value = lipo.purchaseDate || '';
+      document.getElementById('notes').value = lipo.notes || '';
+
+      document.getElementById('saveBtn').innerText = 'Änderungen Speichern';
+      document.getElementById('addFormDetails').open = true;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function deleteLipo(id) {
       if (confirm('Akku wirklich löschen?')) {
         liposafe = liposafe.filter(item => item.id !== id);
@@ -227,26 +477,56 @@
       }
     }
 
-    function filterList(filter, btn) {
-      currentFilter = filter;
+    function filterCell(cell, btn) {
+      currentCellFilter = cell;
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       render();
     }
 
-    function render() {
-      lipoList.innerHTML = '';
-      const query = document.getElementById('search').value.toLowerCase();
+    function calculateCharge() {
+      const mah = Number(document.getElementById('calcMah').value) || 0;
+      const c = Number(document.getElementById('calcC').value) || 1;
+      const count = Number(document.getElementById('calcCount').value) || 1;
+      const amps = ((mah / 1000) * c * count).toFixed(1);
+      document.getElementById('calcResult').innerText = `${amps} A`;
+    }
 
-      const filtered = liposafe.filter(item => {
-        const matchesCell = currentFilter === 'ALL' || item.cells === currentFilter;
-        const matchesQuery = item.name.toLowerCase().includes(query) || 
-                             (item.model && item.model.toLowerCase().includes(query));
-        return matchesCell && matchesQuery;
+    function updateStats() {
+      document.getElementById('stTotal').innerText = liposafe.length;
+      document.getElementById('stStorage').innerText = liposafe.filter(i => i.status === 'Storage').length;
+      document.getElementById('stCharged').innerText = liposafe.filter(i => i.status === 'Geladen').length;
+      document.getElementById('stDischarged').innerText = liposafe.filter(i => i.status === 'Entladen').length;
+    }
+
+    function render() {
+      updateStats();
+      lipoList.innerHTML = '';
+
+      const query = document.getElementById('search').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value;
+      const sortBy = document.getElementById('sortBy').value;
+
+      let filtered = liposafe.filter(item => {
+        const matchesCell = currentCellFilter === 'ALL' || item.cells === currentCellFilter;
+        const matchesStatus = statusFilter === 'ALL' || item.status === statusFilter;
+        const matchesQuery = item.name.toLowerCase().includes(query) ||
+                             (item.model && item.model.toLowerCase().includes(query)) ||
+                             (item.connector && item.connector.toLowerCase().includes(query));
+        return matchesCell && matchesStatus && matchesQuery;
+      });
+
+      // Sortierung
+      filtered.sort((a, b) => {
+        if (sortBy === 'name') return a.name.localeCompare(b.name);
+        if (sortBy === 'capacity') return b.capacity - a.capacity;
+        if (sortBy === 'cycles') return (b.cycles || 0) - (a.cycles || 0);
+        if (sortBy === 'cells') return parseInt(a.cells) - parseInt(b.cells);
+        return 0;
       });
 
       if (filtered.length === 0) {
-        lipoList.innerHTML = '<div style="text-align:center; color: var(--subtext); padding: 24px;">Keine Akkus gefunden.</div>';
+        lipoList.innerHTML = '<div style="text-align:center; color: var(--subtext); padding: 30px;">Keine Akkus gefunden.</div>';
         return;
       }
 
@@ -255,23 +535,69 @@
         if (item.status === 'Geladen') statusClass = 'status-charged';
         if (item.status === 'Entladen') statusClass = 'status-discharged';
 
+        const numText = item.number ? ` <strong>${item.number}</strong>` : '';
         const crateText = item.crate ? ` • ${item.crate}` : '';
-        const modelText = item.model ? ` • ${item.model}` : '';
+        const chargeCText = item.chargeC ? ` • Max ${item.chargeC}C Laden` : '';
 
         const div = document.createElement('div');
         div.className = 'lipo-item';
         div.innerHTML = `
-          <div>
-            <div class="lipo-title">${item.name}</div>
-            <div class="lipo-sub">${item.cells} • ${item.capacity} mAh${crateText}${modelText}</div>
+          <div class="lipo-header">
+            <div>
+              <span class="lipo-title">${item.name}</span>${numText}
+            </div>
+            <span class="badge ${statusClass}" onclick="toggleStatus(${item.id})">${item.status}</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span class="badge ${statusClass}" onclick="toggleStatus(${item.id})" title="Tippen zum Ändern">${item.status}</span>
-            <button class="delete-btn" onclick="deleteLipo(${item.id})">✕</button>
+
+          <div class="lipo-details">
+            <div>Zellen: <strong>${item.cells}</strong></div>
+            <div>Kapazität: <strong>${item.capacity} mAh</strong></div>
+            <div>Stecker: <strong>${item.connector}</strong></div>
+            <div>Rate: <strong>${crateText.replace('• ', '')}${chargeCText}</strong></div>
+            <div>Zyklen: <strong>${item.cycles || 0}</strong></div>
+            <div>Widerstand: <strong>${item.resistance || 'N/A'}</strong></div>
+            ${item.model ? `<div style="grid-column: span 2">Modell: <strong>${item.model}</strong></div>` : ''}
+            ${item.notes ? `<div style="grid-column: span 2; font-style: italic;">"${item.notes}"</div>` : ''}
+          </div>
+
+          <div class="actions">
+            <div>
+              <button class="btn-small" onclick="addCycle(${item.id})">+1 Zyklus</button>
+              <button class="btn-small" onclick="editLipo(${item.id})">✏️ Edit</button>
+            </div>
+            <button class="btn-small btn-danger" onclick="deleteLipo(${item.id})">🗑️ Löschen</button>
           </div>
         `;
         lipoList.appendChild(div);
       });
+    }
+
+    // Export & Import
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(liposafe, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", `lipo_backup_${new Date().toISOString().slice(0,10)}.json`);
+      dlAnchor.click();
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (Array.isArray(imported)) {
+            liposafe = imported;
+            saveAndRender();
+            alert('Daten erfolgreich importiert!');
+          }
+        } catch(err) {
+          alert('Fehler beim Importieren der Datei.');
+        }
+      };
+      reader.readAsText(file);
     }
 
     render();
