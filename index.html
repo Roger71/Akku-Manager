@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Roger’s Akku Manager</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Akku Manager">
+    <meta name="theme-color" content="#f2f2f7">
+
+    <style>
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --primary: #007aff;
+            --primary-hover: #0056b3;
+            --danger: #ff3b30;
+            --text-dark: #000000;
+            --text-muted: #55555e;
+            --border-color: #d1d1d6;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 14px 10px 40px 10px;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 18px;
+            padding-top: 6px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .grid-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #fafafa;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+        }
+
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .btn-chip {
+            background: #e5e5ea;
+            border: none;
+            border-radius: 12px;
+            padding: 6px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .btn-chip:active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        button.btn-add {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button.btn-cancel {
+            background: #e5e5ea;
+            color: var(--text-dark);
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .section-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 24px 0 10px 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 18px;
+        }
+
+        .battery-item {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .battery-item:nth-child(even) {
+            background-color: #f9f9fc;
+        }
+
+        .battery-item:last-child {
+            border-bottom: none;
+        }
+
+        .battery-main-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .akku-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .manufacturer-tag {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #e5f0ff;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .type-tag {
+            font-weight: 800;
+            color: #000000;
+            font-size: 16px;
+        }
+
+        .cap-tag {
+            color: #0056b3;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .battery-data-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .data-badge {
+            font-size: 13px;
+            color: #1c1c1e;
+        }
+
+        .data-badge strong {
+            font-weight: 700;
+            color: #000;
+            font-size: 14px;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .btn-action {
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-edit {
+            background: #e5f0ff;
+            color: var(--primary);
+        }
+
+        .btn-del {
+            background: #ffe5e5;
+            color: var(--danger);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 15px;
+            color: var(--text-muted);
+        }
+
+        .backup-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+
+        .backup-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .backup-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-secondary-sm {
+            background: #e5e5ea;
+            color: #1c1c1e;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🔋 Roger’s Akku Manager</h1>
+        <p>Übersicht & Verwaltung deiner Akkus</p>
+    </header>
+
+    <div class="card" id="formCard">
+        <h3 class="card-title" id="formTitle">➕ Neuen Akku hinzufügen</h3>
+        <form id="lipoForm">
+            <div class="grid-form">
+                <div class="form-group full-width">
+                    <label>Hersteller (Optional)</label>
+                    <input type="text" id="manufacturer" placeholder="Name eingeben oder auswählen">
+                    <div class="quick-buttons">
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Tattu')">Tattu</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('CNHL')">CNHL</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('SLS')">SLS</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Wellpower')">Wellpower</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Turnigy')">Turnigy</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Hacker')">Hacker</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Ovonic')">Ovonic</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Gens ace')">Gens ace</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Spektrum')">Spektrum</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('GNB')">GNB</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('HRB')">HRB</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Zippy')">Zippy</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Akku Typ</label>
+                    <select id="type">
+                        <option value="LiPo" selected>LiPo</option>
+                        <option value="LiHV">LiHV</option>
+                        <option value="LiFe">LiFe</option>
+                        <option value="LiIon">LiIon</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Kapazität (mAh)</label>
+                    <input type="number" id="capacity" placeholder="z. B. 1500" min="50" max="50000" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Zellenzahl (S)</label>
+                    <input type="number" id="cellCount" placeholder="z. B. 4" min="1" max="14" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Gewicht (g)</label>
+                    <input type="number" id="weight" placeholder="z. B. 180" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Laderate (C)</label>
+                    <input type="number" id="chargeRate" placeholder="z. B. 1.0" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Entladerate (C)</label>
+                    <input type="number" id="dischargeRate" placeholder="z. B. 75" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Kaufdatum (Optional)</label>
+                    <input type="date" id="purchaseDate">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" id="cancelBtn" style="display:none;" onclick="cancelEdit()">Abbrechen</button>
+                <button type="submit" class="btn-add" id="submitBtn">Akku Speichern</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="batteryList"></div>
+
+    <div class="backup-bar">
+        <div class="backup-actions">
+            <button class="btn-secondary-sm" onclick="exportData()">📥 Export</button>
+            <button class="btn-secondary-sm" onclick="document.getElementById('importFile').click()">📤 Import</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        </div>
+        <span class="backup-title">💾 Daten-Backup</span>
+    </div>
+
+    <script>
+        let batteries = [];
+        try {
+            batteries = JSON.parse(localStorage.getItem('lipo_batteries_db')) || [];
+        } catch (e) {
+            console.log('LocalStorage nicht zugänglich');
+        }
+
+        let editingId = null;
+
+        function setManufacturer(name) {
+            document.getElementById('manufacturer').value = name;
+        }
+
+        document.getElementById('lipoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const batteryData = {
+                manufacturer: document.getElementById('manufacturer').value.trim() || "-",
+                type: document.getElementById('type').value,
+                capacity: parseInt(document.getElementById('capacity').value),
+                cellCount: parseInt(document.getElementById('cellCount').value),
+                chargeRate: parseFloat(document.getElementById('chargeRate').value),
+                dischargeRate: parseInt(document.getElementById('dischargeRate').value),
+                weight: parseFloat(document.getElementById('weight').value),
+                purchaseDate: document.getElementById('purchaseDate').value || ""
+            };
+
+            if (editingId !== null) {
+                const index = batteries.findIndex(b => b.id === editingId);
+                if (index !== -1) {
+                    batteries[index] = { id: editingId, ...batteryData };
+                }
+            } else {
+                batteries.push({ id: Date.now(), ...batteryData });
+            }
+
+            saveAndRender();
+            cancelEdit();
+        });
+
+        function editBattery(id) {
+            const b = batteries.find(item => item.id === id);
+            if (!b) return;
+
+            editingId = id;
+            document.getElementById('manufacturer').value = b.manufacturer === '-' ? '' : b.manufacturer;
+            document.getElementById('type').value = b.type;
+            document.getElementById('capacity').value = b.capacity;
+            document.getElementById('cellCount').value = b.cellCount;
+            document.getElementById('weight').value = b.weight;
+            document.getElementById('chargeRate').value = b.chargeRate;
+            document.getElementById('dischargeRate').value = b.dischargeRate;
+            document.getElementById('purchaseDate').value = b.purchaseDate;
+
+            document.getElementById('formTitle').innerText = "✏️ Akku bearbeiten";
+            document.getElementById('submitBtn').innerText = "Änderung Speichern";
+            document.getElementById('cancelBtn').style.display = "block";
+
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            editingId = null;
+            document.getElementById('lipoForm').reset();
+            document.getElementById('type').value = "LiPo";
+            document.getElementById('formTitle').innerText = "➕ Neuen Akku hinzufügen";
+            document.getElementById('submitBtn').innerText = "Akku Speichern";
+            document.getElementById('cancelBtn').style.display = "none";
+        }
+
+        function deleteBattery(id) {
+            if (confirm("Möchtest du diesen Akku wirklich löschen?")) {
+                batteries = batteries.filter(b => b.id !== id);
+                if (editingId === id) cancelEdit();
+                saveAndRender();
+            }
+        }
+
+        function saveAndRender() {
+            try {
+                localStorage.setItem('lipo_batteries_db', JSON.stringify(batteries));
+            } catch (e) {}
+            render();
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'k. A.';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}.${parts[1]}.${parts[0]}`;
+            }
+            return dateStr;
+        }
+
+        function exportData() {
+            if (!batteries || batteries.length === 0) {
+                alert("Keine Akkus zum Exportieren vorhanden.");
+                return;
+            }
+
+            const jsonStr = JSON.stringify(batteries, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.href = url;
+            downloadAnchor.download = `rogers_akkus_backup_${new Date().toISOString().slice(0,10)}.json`;
+            
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            document.body.removeChild(downloadAnchor);
+
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        batteries = imported;
+                        saveAndRender();
+                        alert("Backup erfolgreich geladen!");
+                    } else {
+                        alert("Ungültiges Dateiformat.");
+                    }
+                } catch (err) {
+                    alert("Fehler beim Lesen der Datei.");
+                }
+            };
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0]);
+            }
+        }
+
+        function render() {
+            const listDiv = document.getElementById('batteryList');
+            listDiv.innerHTML = '';
+
+            const grouped = {};
+            batteries.forEach(b => {
+                if (!grouped[b.cellCount]) grouped[b.cellCount] = [];
+                grouped[b.cellCount].push(b);
+            });
+
+            const sortedCells = Object.keys(grouped).map(Number).sort((a, b) => a - b);
+
+            if (sortedCells.length === 0) {
+                listDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 32px;">📭</div>
+                        <p>Keine Akkus vorhanden.<br>Füge oben deinen ersten Akku hinzu.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            sortedCells.forEach(cell => {
+                const section = document.createElement('div');
+                section.className = 'section-header';
+                section.innerHTML = `
+                    <span>${cell}S Akkus</span>
+                    <span class="section-badge">${grouped[cell].length} Akku${grouped[cell].length > 1 ? 's' : ''}</span>
+                `;
+                listDiv.appendChild(section);
+
+                const container = document.createElement('div');
+                container.className = 'table-container';
+
+                container.innerHTML = grouped[cell].map(b => `
+                    <div class="battery-item">
+                        <div class="battery-main-row">
+                            <div class="akku-title">
+                                ${b.manufacturer && b.manufacturer !== '-' ? `<span class="manufacturer-tag">${b.manufacturer}</span>` : ''}
+                                <span class="type-tag">${b.type}</span>
+                                <span class="cap-tag">${b.capacity} mAh</span>
+                            </div>
+                            <div class="action-btns">
+                                <button class="btn-action btn-edit" onclick="editBattery(${b.id})" title="Bearbeiten">✏️</button>
+                                <button class="btn-action btn-del" onclick="deleteBattery(${b.id})" title="Löschen">✕</button>
+                            </div>
+                        </div>
+
+                        <div class="battery-data-row">
+                            <span class="data-badge">⚡ <strong>${b.chargeRate}C / ${b.dischargeRate}C</strong></span>
+                            <span class="data-badge">⚖️ <strong>${b.weight}g</strong></span>
+                            <span class="data-badge">📅 <strong>${formatDate(b.purchaseDate)}</strong></span>
+                        </div>
+                    </div>
+                `).join('');
+
+                listDiv.appendChild(container);
+            });
+        }
+
+        render();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>
