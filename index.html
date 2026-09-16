@@ -402,7 +402,7 @@
 
                 <div class="form-group">
                     <label>Entladerate (C)</label>
-                    <input type="number" id="dischargeRate" placeholder="z. B. 75" required>
+                    <input type="text" id="dischargeRate" placeholder="z. B. 75 oder 30/70" required>
                 </div>
 
                 <div class="form-group full-width">
@@ -443,6 +443,15 @@
             document.getElementById('manufacturer').value = name;
         }
 
+        function formatDischarge(val) {
+            if (!val) return '-';
+            let str = String(val).trim();
+            if (!str.toLowerCase().endsWith('c')) {
+                str += 'C';
+            }
+            return str;
+        }
+
         document.getElementById('lipoForm').addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -452,7 +461,7 @@
                 capacity: parseInt(document.getElementById('capacity').value),
                 cellCount: parseInt(document.getElementById('cellCount').value),
                 chargeRate: parseFloat(document.getElementById('chargeRate').value),
-                dischargeRate: parseInt(document.getElementById('dischargeRate').value),
+                dischargeRate: document.getElementById('dischargeRate').value.trim(),
                 weight: parseFloat(document.getElementById('weight').value),
                 purchaseDate: document.getElementById('purchaseDate').value || ""
             };
@@ -481,7 +490,7 @@
             document.getElementById('cellCount').value = b.cellCount;
             document.getElementById('weight').value = b.weight;
             document.getElementById('chargeRate').value = b.chargeRate;
-            document.getElementById('dischargeRate').value = b.dischargeRate;
+            document.getElementById('dischargeRate').value = b.dischargeRate || '';
             document.getElementById('purchaseDate').value = b.purchaseDate;
 
             document.getElementById('formTitle').innerText = "✏️ Akku bearbeiten";
@@ -615,7 +624,7 @@
                         </div>
 
                         <div class="battery-data-row">
-                            <span class="data-badge">⚡ <strong>${b.chargeRate}C / ${b.dischargeRate}C</strong></span>
+                            <span class="data-badge">⚡ <strong>${b.chargeRate}C / ${formatDischarge(b.dischargeRate)}</strong></span>
                             <span class="data-badge">⚖️ <strong>${b.weight}g</strong></span>
                             <span class="data-badge">📅 <strong>${formatDate(b.purchaseDate)}</strong></span>
                         </div>
