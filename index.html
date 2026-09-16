@@ -49,18 +49,20 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER SECTION */
+        /* HEADER SECTION - HORIZONTAL LAYOUT */
         header {
-            text-align: center;
-            margin: 12px 0 22px 0;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 8px 4px 20px 4px;
         }
 
         .header-icon-box {
-            width: 76px;
-            height: 76px;
-            margin: 0 auto 12px auto;
-            border-radius: 18px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(132, 204, 22, 0.2);
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 0 12px rgba(132, 204, 22, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -69,19 +71,26 @@
         }
 
         .header-icon-box svg {
-            width: 76px;
-            height: 76px;
+            width: 56px;
+            height: 56px;
         }
 
-        header h1 {
-            font-size: 24px;
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header-text h1 {
+            font-size: 21px;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            margin: 0 0 4px 0;
+            letter-spacing: -0.4px;
+            margin: 0 0 2px 0;
             color: var(--text-dark);
+            line-height: 1.15;
         }
 
-        header p {
+        .header-text p {
             font-size: 13px;
             color: var(--text-muted);
             margin: 0;
@@ -412,8 +421,10 @@
 
     <header>
         <div class="header-icon-box" id="headerIcon"></div>
-        <h1>Roger’s Akku Manager</h1>
-        <p>Akkus einfach & präzise verwalten</p>
+        <div class="header-text">
+            <h1>Roger’s Akku Manager</h1>
+            <p>Akkus einfach & präzise verwalten</p>
+        </div>
     </header>
 
     <div class="card" id="formCard">
