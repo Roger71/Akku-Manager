@@ -8,10 +8,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Akku Manager">
-    <meta name="theme-color" content="#f2f2f7">
+    <meta name="theme-color" content="#121318">
 
-    <!-- Standard Favicon -->
-    <link rel="icon" type="image/svg+xml" id="favicon">
+    <!-- Dynamisches Apple Touch Icon & Favicon -->
+    <link rel="icon" type="image/png" id="favicon">
     <link rel="apple-touch-icon" id="appleTouchIcon">
 
     <style>
@@ -20,7 +20,6 @@
             --card-bg: #ffffff;
             --primary: #0066ff;
             --primary-light: #e8f0fe;
-            --primary-dark: #0052cc;
             --danger: #ff3b30;
             --danger-light: #ffe5e5;
             --text-dark: #1c1c1e;
@@ -53,24 +52,25 @@
         /* HEADER SECTION */
         header {
             text-align: center;
-            margin: 12px 0 20px 0;
+            margin: 12px 0 22px 0;
         }
 
         .header-icon-box {
-            width: 68px;
-            height: 68px;
-            margin: 0 auto 10px auto;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2);
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 12px auto;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(132, 204, 22, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1c1d22 0%, #0d0e12 100%);
+            background: #121318;
+            overflow: hidden;
         }
 
         .header-icon-box svg {
-            width: 58px;
-            height: 58px;
+            width: 76px;
+            height: 76px;
         }
 
         header h1 {
@@ -362,7 +362,7 @@
             color: var(--text-muted);
             background: var(--card-bg);
             border-radius: var(--radius-lg);
-            border: 1px stroke var(--border-color);
+            border: 1px solid var(--border-color);
         }
 
         /* BACKUP FOOTER BAR */
@@ -424,8 +424,8 @@
                     <label>Hersteller (Optional)</label>
                     <input type="text" id="manufacturer" placeholder="Name eingeben oder wählen">
                     <div class="quick-buttons">
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Tattu')">Tattu</button>
                         <button type="button" class="btn-chip" onclick="setManufacturer('CNHL')">CNHL</button>
+                        <button type="button" class="btn-chip" onclick="setManufacturer('Tattu')">Tattu</button>
                         <button type="button" class="btn-chip" onclick="setManufacturer('SLS')">SLS</button>
                         <button type="button" class="btn-chip" onclick="setManufacturer('Wellpower')">Wellpower</button>
                         <button type="button" class="btn-chip" onclick="setManufacturer('Turnigy')">Turnigy</button>
@@ -469,7 +469,7 @@
 
                 <div class="form-group">
                     <label>Entladerate (C)</label>
-                    <input type="text" id="dischargeRate" placeholder="z. B. 75 oder 30/70" required>
+                    <input type="text" id="dischargeRate" placeholder="z. B. 70 oder 30/70" required>
                 </div>
 
                 <div class="form-group full-width">
@@ -497,47 +497,84 @@
     </div>
 
     <script>
-        // --- 1. ICON GENERATOR (Dynamic SVG Home Screen Icon) ---
-        const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+        // --- CNHL G+ PLUS LIPO ICON GENERATOR ---
+        const cnhlGPlusIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
             <defs>
-                <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#1c1d22"/>
-                    <stop offset="100%" stop-color="#0c0d10"/>
+                <linearGradient id="cnhl-bg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#181a20"/>
+                    <stop offset="100%" stop-color="#0a0b0e"/>
                 </linearGradient>
-                <linearGradient id="bat" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#fbbf24"/>
-                    <stop offset="100%" stop-color="#d97706"/>
+                <linearGradient id="cnhl-green" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#84cc16"/>
+                    <stop offset="100%" stop-color="#15803d"/>
                 </linearGradient>
-                <linearGradient id="xt" x1="0" y1="0" x2="1" y2="0">
+                <linearGradient id="xt60-grad" x1="0" y1="0" x2="1" y2="0">
                     <stop offset="0%" stop-color="#f59e0b"/>
                     <stop offset="100%" stop-color="#b45309"/>
                 </linearGradient>
-                <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-                    <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity="0.6"/>
+                <linearGradient id="pack-body" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#27272a"/>
+                    <stop offset="100%" stop-color="#09090b"/>
+                </linearGradient>
+                <filter id="cnhl-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity="0.75"/>
+                    <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#84cc16" flood-opacity="0.3"/>
                 </filter>
             </defs>
-            <rect width="512" height="512" rx="115" fill="url(#bg)"/>
-            <rect x="20" y="20" width="472" height="472" rx="95" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="3"/>
-            <g filter="url(#shadow)">
-                <path d="M 230 135 Q 220 85 285 75" stroke="#ef4444" stroke-width="18" fill="none" stroke-linecap="round"/>
-                <path d="M 195 135 Q 185 65 245 55" stroke="#374151" stroke-width="18" fill="none" stroke-linecap="round"/>
-                <rect x="265" y="50" width="55" height="38" rx="8" fill="url(#xt)" transform="rotate(-12 290 70)"/>
-                <rect x="105" y="135" width="302" height="290" rx="28" fill="url(#bat)"/>
-                <rect x="105" y="135" width="302" height="58" rx="28" fill="#18181b"/>
-                <rect x="105" y="165" width="302" height="28" fill="#18181b"/>
-                <rect x="125" y="210" width="262" height="190" rx="18" fill="#09090b" opacity="0.92"/>
-                <path d="M 265 230 L 225 305 L 265 305 L 245 380 L 295 295 L 255 295 Z" fill="#fbbf24"/>
-                <text x="256" y="340" fill="#ffffff" font-family="-apple-system, sans-serif" font-weight="900" font-size="22" text-anchor="middle" letter-spacing="4">LIPO PACK</text>
+            
+            <rect width="512" height="512" rx="115" fill="url(#cnhl-bg)"/>
+            <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#84cc16" stroke-opacity="0.25" stroke-width="3"/>
+            
+            <g filter="url(#cnhl-glow)">
+                <!-- Power Cable Red AWG -->
+                <path d="M 220 135 C 210 70, 270 65, 295 55" stroke="#ef4444" stroke-width="20" fill="none" stroke-linecap="round"/>
+                <!-- Power Cable Black AWG -->
+                <path d="M 185 135 C 175 55, 235 50, 260 40" stroke="#3f3f46" stroke-width="20" fill="none" stroke-linecap="round"/>
+                
+                <!-- XT60 Plug -->
+                <rect x="275" y="28" width="58" height="40" rx="8" fill="url(#xt60-grad)" transform="rotate(-15 300 48)"/>
+                
+                <!-- Balance Cable JST-XH -->
+                <path d="M 320 135 C 330 95, 360 90, 370 75" stroke="#e4e4e7" stroke-width="9" fill="none"/>
+                <rect x="360" y="55" width="24" height="30" rx="4" fill="#ffffff" transform="rotate(12 372 70)"/>
+
+                <!-- Main Pack -->
+                <rect x="110" y="125" width="292" height="310" rx="26" fill="url(#pack-body)"/>
+                
+                <!-- Top Cap -->
+                <rect x="110" y="125" width="292" height="48" rx="26" fill="#18181b"/>
+                <rect x="110" y="150" width="292" height="23" fill="#18181b"/>
+                <line x1="110" y1="173" x2="402" y2="173" stroke="#27272a" stroke-width="2"/>
+
+                <!-- Signature Green Diagonal Stripe -->
+                <path d="M 110 210 L 402 180 L 402 225 L 110 255 Z" fill="url(#cnhl-green)"/>
+                
+                <!-- Label Container -->
+                <rect x="126" y="240" width="260" height="175" rx="14" fill="#000000" fill-opacity="0.8" stroke="#27272a" stroke-width="1.5"/>
+
+                <!-- CNHL Text Logo -->
+                <text x="145" y="286" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="36" letter-spacing="2">CNHL</text>
+                
+                <!-- G+ Badge -->
+                <rect x="285" y="252" width="82" height="42" rx="8" fill="url(#cnhl-green)"/>
+                <text x="326" y="283" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="26" text-anchor="middle">G+</text>
+
+                <!-- Specs Callout -->
+                <text x="145" y="325" fill="#84cc16" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="18" letter-spacing="1">GRAPHENE</text>
+                <text x="145" y="358" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="28" letter-spacing="1">70C / 140C</text>
+                
+                <!-- Cell Info -->
+                <text x="365" y="390" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="16" text-anchor="end">4S LiPo</text>
             </g>
         </svg>`;
 
-        // Render Icon into Header
-        document.getElementById('headerIcon').innerHTML = svgIcon;
+        // Render in Header Box
+        document.getElementById('headerIcon').innerHTML = cnhlGPlusIcon;
 
-        // Generate PNG Touch Icon for iOS Homescreen
-        (function setupIcons() {
-            const svgBlob = new Blob([svgIcon], {type: 'image/svg+xml;charset=utf-8'});
-            const url = URL.createObjectURL(svgBlob);
+        // Generate dynamic PNG for iOS Touch Icon and Favicon
+        (function generateAppIcons() {
+            const blob = new Blob([cnhlGPlusIcon], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
@@ -545,15 +582,15 @@
                 canvas.height = 512;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
-                const pngData = canvas.toDataURL('image/png');
-                document.getElementById('appleTouchIcon').href = pngData;
-                document.getElementById('favicon').href = pngData;
+                const pngUrl = canvas.toDataURL('image/png');
+                document.getElementById('appleTouchIcon').href = pngUrl;
+                document.getElementById('favicon').href = pngUrl;
                 URL.revokeObjectURL(url);
             };
             img.src = url;
         })();
 
-        // --- 2. APP LOGIC ---
+        // --- APP LOGIC ---
         let batteries = [];
         try {
             batteries = JSON.parse(localStorage.getItem('lipo_batteries_db')) || [];
