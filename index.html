@@ -12,8 +12,10 @@
       --text: #000000;
       --subtext: #6c6c70;
       --border: #e5e5ea;
-      --input-bg: #e5e5ea;
+      --input-bg: #f2f2f7;
       --red: #ff3b30;
+      --green: #34c759;
+      --orange: #ff9500;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -23,16 +25,16 @@
       padding: 16px;
       -webkit-user-select: none;
     }
-    h1 { font-size: 24px; margin-bottom: 16px; }
+    h1 { font-size: 24px; margin-bottom: 16px; font-weight: 700; }
     .card {
       background: var(--card);
       border-radius: 12px;
       padding: 16px;
       margin-bottom: 16px;
       border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
-    label { display: block; font-size: 12px; color: var(--subtext); margin-top: 8px; }
+    label { display: block; font-size: 12px; color: var(--subtext); margin-top: 8px; font-weight: 600; }
     input, select {
       width: 100%;
       padding: 10px;
@@ -41,7 +43,7 @@
       border: 1px solid var(--border);
       background: var(--input-bg);
       color: var(--text);
-      font-size: 16px;
+      font-size: 15px;
       box-sizing: border-box;
     }
     button.submit-btn {
@@ -52,8 +54,8 @@
       padding: 12px;
       border-radius: 8px;
       font-size: 16px;
-      font-weight: bold;
-      margin-top: 12px;
+      font-weight: 600;
+      margin-top: 14px;
       cursor: pointer;
     }
     .filter-group {
@@ -61,17 +63,18 @@
       gap: 8px;
       overflow-x: auto;
       padding-bottom: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     .filter-btn {
-      background: #e5e5ea;
+      background: var(--card);
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 14px;
       border-radius: 16px;
-      font-size: 14px;
+      font-size: 13px;
       white-space: nowrap;
       cursor: pointer;
+      font-weight: 500;
     }
     .filter-btn.active {
       background: var(--accent);
@@ -80,17 +83,28 @@
     }
     .lipo-item {
       background: var(--card);
-      border-radius: 10px;
-      padding: 12px 16px;
+      border-radius: 12px;
+      padding: 14px 16px;
       margin-bottom: 8px;
       border: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
-    .lipo-title { font-weight: bold; font-size: 16px; }
-    .lipo-sub { font-size: 13px; color: var(--subtext); margin-top: 2px; }
+    .lipo-title { font-weight: 600; font-size: 16px; }
+    .lipo-sub { font-size: 13px; color: var(--subtext); margin-top: 3px; }
+    .badge {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+    }
+    .status-storage { background: rgba(255, 149, 0, 0.15); color: var(--orange); }
+    .status-charged { background: rgba(52, 199, 89, 0.15); color: var(--green); }
+    .status-discharged { background: rgba(255, 59, 48, 0.15); color: var(--red); }
     .delete-btn {
       background: transparent;
       color: var(--red);
@@ -98,6 +112,7 @@
       font-size: 18px;
       cursor: pointer;
       padding: 4px 8px;
+      margin-left: 4px;
     }
   </style>
 </head>
@@ -121,6 +136,7 @@
             <option value="3S">3S</option>
             <option value="4S">4S</option>
             <option value="6S" selected>6S</option>
+            <option value="8S">8S</option>
           </select>
         </div>
         <div style="flex: 1;">
@@ -129,11 +145,31 @@
         </div>
       </div>
 
+      <div style="display: flex; gap: 8px;">
+        <div style="flex: 1;">
+          <label>C-Rate (optional)</label>
+          <input type="text" id="crate" placeholder="z. B. 60C">
+        </div>
+        <div style="flex: 1;">
+          <label>Ladezustand</label>
+          <select id="status">
+            <option value="Storage">Lagerspannung</option>
+            <option value="Geladen">Voll Geladen</option>
+            <option value="Entladen">Entladen</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Modell / Notiz (optional)</label>
+      <input type="text" id="model" placeholder="z. B. Super Tucano / Heli">
+
       <button type="submit" class="submit-btn">Akku Speichern</button>
     </form>
   </div>
 
-  <!-- Schnell-Filter -->
+  <!-- Suche & Schnell-Filter -->
+  <input type="text" id="search" placeholder="🔍 Akkus durchsuchen..." oninput="render()" style="margin-bottom: 12px; background: var(--card);">
+
   <div class="filter-group" id="filterBar">
     <button class="filter-btn active" onclick="filterList('ALL', this)">Alle</button>
     <button class="filter-btn" onclick="filterList('1S', this)">1S</button>
@@ -159,7 +195,10 @@
         id: Date.now(),
         name: document.getElementById('name').value,
         cells: document.getElementById('cells').value,
-        capacity: document.getElementById('capacity').value
+        capacity: document.getElementById('capacity').value,
+        crate: document.getElementById('crate').value || '',
+        status: document.getElementById('status').value,
+        model: document.getElementById('model').value || ''
       };
       liposafe.push(newLipo);
       saveAndRender();
@@ -171,9 +210,21 @@
       render();
     }
 
+    function toggleStatus(id) {
+      const lipo = liposafe.find(item => item.id === id);
+      if (lipo) {
+        if (lipo.status === 'Storage') lipo.status = 'Geladen';
+        else if (lipo.status === 'Geladen') lipo.status = 'Entladen';
+        else lipo.status = 'Storage';
+        saveAndRender();
+      }
+    }
+
     function deleteLipo(id) {
-      liposafe = liposafe.filter(item => item.id !== id);
-      saveAndRender();
+      if (confirm('Akku wirklich löschen?')) {
+        liposafe = liposafe.filter(item => item.id !== id);
+        saveAndRender();
+      }
     }
 
     function filterList(filter, btn) {
@@ -185,22 +236,39 @@
 
     function render() {
       lipoList.innerHTML = '';
-      const filtered = liposafe.filter(item => currentFilter === 'ALL' || item.cells === currentFilter);
+      const query = document.getElementById('search').value.toLowerCase();
+
+      const filtered = liposafe.filter(item => {
+        const matchesCell = currentFilter === 'ALL' || item.cells === currentFilter;
+        const matchesQuery = item.name.toLowerCase().includes(query) || 
+                             (item.model && item.model.toLowerCase().includes(query));
+        return matchesCell && matchesQuery;
+      });
 
       if (filtered.length === 0) {
-        lipoList.innerHTML = '<div style="text-align:center; color: var(--subtext); padding: 20px;">Keine Akkus vorhanden.</div>';
+        lipoList.innerHTML = '<div style="text-align:center; color: var(--subtext); padding: 24px;">Keine Akkus gefunden.</div>';
         return;
       }
 
       filtered.forEach(item => {
+        let statusClass = 'status-storage';
+        if (item.status === 'Geladen') statusClass = 'status-charged';
+        if (item.status === 'Entladen') statusClass = 'status-discharged';
+
+        const crateText = item.crate ? ` • ${item.crate}` : '';
+        const modelText = item.model ? ` • ${item.model}` : '';
+
         const div = document.createElement('div');
         div.className = 'lipo-item';
         div.innerHTML = `
           <div>
             <div class="lipo-title">${item.name}</div>
-            <div class="lipo-sub">${item.cells} • ${item.capacity} mAh</div>
+            <div class="lipo-sub">${item.cells} • ${item.capacity} mAh${crateText}${modelText}</div>
           </div>
-          <button class="delete-btn" onclick="deleteLipo(${item.id})">✕</button>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="badge ${statusClass}" onclick="toggleStatus(${item.id})" title="Tippen zum Ändern">${item.status}</span>
+            <button class="delete-btn" onclick="deleteLipo(${item.id})">✕</button>
+          </div>
         `;
         lipoList.appendChild(div);
       });
