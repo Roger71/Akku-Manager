@@ -35,6 +35,28 @@
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
         }
 
+        /* DARK MODE SUPPORT */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000;
+                --card-bg: #1c1c1e;
+                --text-dark: #f2f2f7;
+                --text-muted: #8e8e93;
+                --border-color: rgba(255, 255, 255, 0.12);
+                --primary-light: #0a2540;
+                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+                --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+            }
+            input, select {
+                background-color: #2c2c2e !important;
+                color: #ffffff !important;
+            }
+            .btn-chip {
+                background: #2c2c2e !important;
+                color: #d1d1d6 !important;
+            }
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -125,7 +147,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         .stat-card {
@@ -152,6 +174,67 @@
             margin-top: 2px;
         }
 
+        /* TOOL BAR BUTTONS (Cheat-Sheet & Parallelladen) */
+        .tools-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .btn-tool {
+            flex: 1;
+            padding: 8px 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* COLLAPSIBLE TOOL PANELS */
+        .tool-panel {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        /* SPANNUNGS TABLE */
+        .voltage-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .voltage-table th {
+            text-align: left;
+            padding: 6px 4px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .voltage-table td {
+            padding: 8px 4px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .voltage-table tr:last-child td { border-bottom: none; }
+        .alert-under-load { color: var(--danger); font-weight: 800; }
+
         /* SEARCH BAR */
         .search-container {
             margin-bottom: 14px;
@@ -166,6 +249,7 @@
             font-size: 14px;
             outline: none;
             box-shadow: var(--shadow-sm);
+            color: var(--text-dark);
         }
 
         /* FORM CARD */
@@ -255,7 +339,6 @@
 
         input:focus, select:focus {
             border-color: var(--primary);
-            background-color: #ffffff;
             box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
         }
 
@@ -393,7 +476,6 @@
         .manufacturer-tag {
             font-size: 13px;
             font-weight: 700;
-            color: #334155;
         }
 
         .cap-tag {
@@ -405,7 +487,7 @@
         .battery-data-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
             font-size: 12px;
             color: var(--text-muted);
@@ -416,7 +498,6 @@
             align-items: center;
             gap: 3px;
             font-size: 12px;
-            color: #475569;
         }
 
         .charge-amp-highlight {
@@ -428,7 +509,19 @@
             border: 1px solid #dbeafe;
         }
 
-        .data-badge strong { font-weight: 700; color: var(--text-dark); }
+        .cycle-btn {
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
 
         .action-btns {
             display: flex;
@@ -536,6 +629,90 @@
         </div>
     </div>
 
+    <!-- TOOL BUTTONS (SPANNUNG & PARALLELLADEN) -->
+    <div class="tools-bar">
+        <button class="btn-tool" onclick="toggleTool('voltagePanel')">⚡ Spannungs-Spickzettel</button>
+        <button class="btn-tool" onclick="toggleTool('parallelPanel')">🔋 Parallellade-Rechner</button>
+    </div>
+
+    <!-- SPANNUNGS-SPICKZETTEL PANEL -->
+    <div class="tool-panel" id="voltagePanel">
+        <div class="form-header">
+            <h3 class="card-title">⚡ Zellenspannungen im Überblick</h3>
+            <button class="btn-close-form" onclick="toggleTool('voltagePanel')">✕</button>
+        </div>
+        <table class="voltage-table">
+            <thead>
+                <tr>
+                    <th>Typ</th>
+                    <th>Voll</th>
+                    <th>Storage</th>
+                    <th>Leer (Ruhe)</th>
+                    <th class="alert-under-load">Min. (unter Last)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>LiPo</strong></td>
+                    <td>4.20 V</td>
+                    <td>3.85 V</td>
+                    <td>3.50 V</td>
+                    <td class="alert-under-load">3.30 V</td>
+                </tr>
+                <tr>
+                    <td><strong>LiHV</strong></td>
+                    <td>4.35 V</td>
+                    <td>3.85 V</td>
+                    <td>3.50 V</td>
+                    <td class="alert-under-load">3.30 V</td>
+                </tr>
+                <tr>
+                    <td><strong>LiIon</strong></td>
+                    <td>4.20 V</td>
+                    <td>3.70 V</td>
+                    <td>3.00 V</td>
+                    <td class="alert-under-load">2.80 V</td>
+                </tr>
+                <tr>
+                    <td><strong>LiFe</strong></td>
+                    <td>3.60 V</td>
+                    <td>3.30 V</td>
+                    <td>2.80 V</td>
+                    <td class="alert-under-load">2.60 V</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 11px; color: var(--text-muted); margin: 8px 0 0 0;">
+            * <strong>Min. unter Last:</strong> Absacken während Vollgas. Fällt die Spannung unter diesen Wert, droht permanente Schädigung der Chemie!
+        </p>
+    </div>
+
+    <!-- PARALLELLADE-RECHNER PANEL -->
+    <div class="tool-panel" id="parallelPanel">
+        <div class="form-header">
+            <h3 class="card-title">🔋 Parallellade-Rechner</h3>
+            <button class="btn-close-form" onclick="toggleTool('parallelPanel')">✕</button>
+        </div>
+        <div class="grid-form">
+            <div class="form-group">
+                <label>Kapazität (mAh)</label>
+                <input type="number" id="pCap" placeholder="1500" value="1500" oninput="calcParallel()" inputmode="numeric">
+            </div>
+            <div class="form-group">
+                <label>Anzahl Akkus</label>
+                <input type="number" id="pCount" placeholder="4" value="4" oninput="calcParallel()" inputmode="numeric">
+            </div>
+            <div class="form-group full-width">
+                <label>Laderate (C)</label>
+                <input type="number" id="pRate" placeholder="1.0" value="1.0" step="0.1" oninput="calcParallel()" inputmode="decimal">
+            </div>
+        </div>
+        <div style="margin-top: 12px; background: #eff6ff; padding: 10px; border-radius: 8px; text-align: center;">
+            <span style="font-size: 12px; color: #1e40af; font-weight: 700;">Empfohlener Ladestrom:</span>
+            <div style="font-size: 22px; font-weight: 900; color: var(--primary);" id="pResult">6.0 A</div>
+        </div>
+    </div>
+
     <!-- SCHNELLSUCHE -->
     <div class="search-container">
         <input type="text" class="search-input" id="searchInput" placeholder="🔍 Akku suchen (z. B. 4S, CNHL, 1500)..." oninput="render()">
@@ -601,6 +778,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Bisherige Zyklen</label>
+                    <input type="number" id="cycles" placeholder="0" min="0" value="0" inputmode="numeric">
+                </div>
+
+                <div class="form-group">
                     <label>Gewicht pro Akku (g)</label>
                     <input type="number" id="weight" placeholder="z. B. 180" step="0.1" inputmode="decimal" required>
                 </div>
@@ -610,7 +792,7 @@
                     <input type="number" id="chargeRate" placeholder="z. B. 1.0" step="0.1" inputmode="decimal" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group full-width">
                     <label>Entladerate (C)</label>
                     <input type="text" id="dischargeRate" placeholder="z. B. 70 oder 30/70" required>
                 </div>
@@ -717,6 +899,19 @@
 
         let editingId = null;
 
+        function toggleTool(panelId) {
+            const p = document.getElementById(panelId);
+            p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function calcParallel() {
+            const cap = parseFloat(document.getElementById('pCap').value) || 0;
+            const count = parseFloat(document.getElementById('pCount').value) || 0;
+            const rate = parseFloat(document.getElementById('pRate').value) || 0;
+            const res = ((cap / 1000) * count * rate).toFixed(1);
+            document.getElementById('pResult').innerText = `${res} A`;
+        }
+
         function toggleForm() {
             const card = document.getElementById('formCard');
             if (card.style.display === 'none' || card.style.display === '') showForm();
@@ -749,6 +944,24 @@
             return str.toLowerCase().endsWith('c') ? str : str + 'C';
         }
 
+        // AKKUALTER BERECHNEN
+        function calculateAge(dateStr) {
+            if (!dateStr) return null;
+            const pDate = new Date(dateStr);
+            if (isNaN(pDate.getTime())) return null;
+            const now = new Date();
+            
+            let months = (now.getFullYear() - pDate.getFullYear()) * 12 + (now.getMonth() - pDate.getMonth());
+            if (now.getDate() < pDate.getDate()) months--;
+            
+            if (months < 0) return 'Neu';
+            if (months === 0) return '< 1 Mon.';
+            if (months < 12) return `${months} Mon.`;
+            
+            const years = (months / 12).toFixed(1);
+            return `${years.replace('.', ',')} J.`;
+        }
+
         document.getElementById('lipoForm').addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -759,6 +972,7 @@
                 capacity: parseInt(document.getElementById('capacity').value),
                 cellCount: parseInt(document.getElementById('cellCount').value),
                 qty: parseInt(document.getElementById('qty').value) || 1,
+                cycles: parseInt(document.getElementById('cycles').value) || 0,
                 chargeRate: parseFloat(document.getElementById('chargeRate').value),
                 dischargeRate: document.getElementById('dischargeRate').value.trim(),
                 weight: parseFloat(document.getElementById('weight').value),
@@ -776,6 +990,14 @@
             hideForm();
         });
 
+        function incrementCycle(id) {
+            const b = batteries.find(item => item.id === id);
+            if (b) {
+                b.cycles = (b.cycles || 0) + 1;
+                saveAndRender();
+            }
+        }
+
         function editBattery(id) {
             const b = batteries.find(item => item.id === id);
             if (!b) return;
@@ -787,6 +1009,7 @@
             document.getElementById('capacity').value = b.capacity;
             document.getElementById('cellCount').value = b.cellCount;
             document.getElementById('qty').value = b.qty || 1;
+            document.getElementById('cycles').value = b.cycles || 0;
             document.getElementById('weight').value = b.weight;
             document.getElementById('chargeRate').value = b.chargeRate;
             document.getElementById('dischargeRate').value = b.dischargeRate || '';
@@ -803,6 +1026,7 @@
             document.getElementById('type').value = "LiPo";
             document.getElementById('status').value = "ready";
             document.getElementById('qty').value = "1";
+            document.getElementById('cycles').value = "0";
             document.getElementById('formTitle').innerText = "➕ Neuen Akku hinzufügen";
             document.getElementById('submitBtn').innerText = "Akku Speichern";
         }
@@ -820,12 +1044,6 @@
                 localStorage.setItem('lipo_batteries_db', JSON.stringify(batteries));
             } catch (e) {}
             render();
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return 'k. A.';
-            const parts = dateStr.split('-');
-            return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateStr;
         }
 
         function exportData() {
@@ -915,7 +1133,7 @@
                 listDiv.innerHTML = `
                     <div class="empty-state">
                         <div style="font-size: 36px; margin-bottom: 8px;">🔋</div>
-                        <p style="margin: 0; font-weight: 600; color: #1c1c1e;">Keine Akkus gefunden</p>
+                        <p style="margin: 0; font-weight: 600; color: var(--text-dark);">Keine Akkus gefunden</p>
                         <p style="margin: 4px 0 0 0; font-size: 13px;">Tippe auf das Plus oben, um einen Akku hinzuzufügen.</p>
                         <button class="btn-empty-add" onclick="showForm()">➕ Akku hinzufügen</button>
                     </div>
@@ -939,9 +1157,10 @@
                 container.className = 'table-container';
 
                 container.innerHTML = cellGroup.map(b => {
-                    // Ladeampere-Berechnung (Ah * C)
                     const chargeAmps = ((b.capacity / 1000) * b.chargeRate).toFixed(1);
                     const qty = b.qty || 1;
+                    const cycles = b.cycles || 0;
+                    const ageStr = calculateAge(b.purchaseDate);
 
                     return `
                     <div class="battery-item">
@@ -963,7 +1182,13 @@
                             <span class="charge-amp-highlight">⚡ ${chargeAmps} A (${b.chargeRate}C)</span>
                             <span class="data-badge">💥 <strong>${formatDischarge(b.dischargeRate)}</strong></span>
                             <span class="data-badge">⚖️ <strong>${b.weight}g</strong></span>
-                            <span class="data-badge">📅 <strong>${formatDate(b.purchaseDate)}</strong></span>
+                            
+                            <span class="data-badge">
+                                🔄 <strong>${cycles} Zyklen</strong>
+                                <button class="cycle-btn" onclick="incrementCycle(${b.id})" title="1 Zyklus hinzufügen">+1</button>
+                            </span>
+
+                            ${ageStr ? `<span class="data-badge">⏳ <strong>${ageStr} alt</strong></span>` : ''}
                         </div>
                     </div>
                 `}).join('');
