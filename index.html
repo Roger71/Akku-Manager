@@ -126,22 +126,28 @@
             transform: rotate(90deg);
         }
 
-        /* SPICKZETTEL BUTTON */
+        /* SPICKZETTEL BUTTONS GRID */
+        .cheat-buttons-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
         .btn-cheat-toggle {
             width: 100%;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 10px;
-            font-size: 13px;
+            padding: 10px 6px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-dark);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
             cursor: pointer;
-            margin-bottom: 12px;
             box-shadow: var(--shadow-sm);
             transition: background 0.2s;
         }
@@ -195,6 +201,14 @@
             padding: 2px 6px;
             border-radius: 6px;
             display: inline-block;
+        }
+
+        .formula-highlight {
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: inline-block;
+            font-size: 11px;
         }
 
         /* STATS BAR */
@@ -467,7 +481,6 @@
             flex-wrap: wrap;
         }
 
-        /* EINE ZEILE FÜR HERSTELLER + KAPAZITÄT */
         .mfg-cap-line {
             display: inline-flex;
             align-items: baseline;
@@ -475,7 +488,6 @@
             white-space: nowrap;
         }
 
-        /* BADGES */
         .type-badge {
             font-size: 11px;
             font-weight: 800;
@@ -640,16 +652,21 @@
         </div>
     </header>
 
-    <!-- SPANNUNGS-SPICKZETTEL TOGGLE BUTTON -->
-    <button type="button" class="btn-cheat-toggle" onclick="toggleCheatSheet()">
-        <span>⚡ Spannungs-Spickzettel</span>
-    </button>
+    <!-- SPICKZETTEL BUTTONS -->
+    <div class="cheat-buttons-row">
+        <button type="button" class="btn-cheat-toggle" onclick="toggleCheatSheet('cheatCard')">
+            <span>⚡ Spannung</span>
+        </button>
+        <button type="button" class="btn-cheat-toggle" onclick="toggleCheatSheet('ohmCard')">
+            <span>🔋 Innenwiderstand</span>
+        </button>
+    </div>
 
-    <!-- AUSKLAPPBARER SPICKZETTEL -->
+    <!-- SPANNUNGS-SPICKZETTEL -->
     <div class="cheat-card" id="cheatCard">
         <div class="form-header" style="margin-bottom: 8px;">
             <h3 class="card-title">⚡ Zellenspannungen Referenz</h3>
-            <button type="button" class="btn-close-form" onclick="toggleCheatSheet()">✕</button>
+            <button type="button" class="btn-close-form" onclick="toggleCheatSheet('cheatCard')">✕</button>
         </div>
         <table class="voltage-table">
             <thead>
@@ -694,6 +711,48 @@
         </table>
     </div>
 
+    <!-- INNENWIDERSTAND (mΩ) SPICKZETTEL -->
+    <div class="cheat-card" id="ohmCard">
+        <div class="form-header" style="margin-bottom: 8px;">
+            <h3 class="card-title">🔋 Innenwiderstand (mΩ) pro Zelle</h3>
+            <button type="button" class="btn-close-form" onclick="toggleCheatSheet('ohmCard')">✕</button>
+        </div>
+        <table class="voltage-table">
+            <thead>
+                <tr>
+                    <th>mΩ / Zelle</th>
+                    <th>Zustand</th>
+                    <th>Einsatzbereich</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>&lt; 3 mΩ</strong></td>
+                    <td><span class="formula-highlight" style="background:#e8f8ec; color:#15803d;">Top / Neu</span></td>
+                    <td>Extreme Lasten, FPV Racing, Jets</td>
+                </tr>
+                <tr>
+                    <td><strong>3 – 7 mΩ</strong></td>
+                    <td><span class="formula-highlight" style="background:#e8f0fe; color:#0066ff;">Gut</span></td>
+                    <td>Normale Flug-/Fahrzeit, Standard Lasten</td>
+                </tr>
+                <tr>
+                    <td><strong>8 – 15 mΩ</strong></td>
+                    <td><span class="formula-highlight" style="background:#fff5e6; color:#b45309;">Mäßig</span></td>
+                    <td>Geringe Ströme, Cruisen, Training</td>
+                </tr>
+                <tr>
+                    <td><strong>&gt; 15 mΩ</strong></td>
+                    <td><span class="formula-highlight" style="background:#ffe5e5; color:#ff3b30;">Kritisch</span></td>
+                    <td>Starker Voltage Sag, wird heiß, Ausmusterung</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 11px; color: var(--text-muted); margin: 10px 2px 0 2px; line-height: 1.35;">
+            💡 <strong>Hinweis:</strong> Gemessen bei ~20°C. Kalte Akkus zeigen höhere mΩ-Werte! Größere Akkus (&gt;3000 mAh) haben naturgemäß kleinere mΩ-Werte als kleine Akkus (&lt;1000 mAh).
+        </p>
+    </div>
+
     <!-- STATISTIK BAR -->
     <div class="stats-grid">
         <div class="stat-card">
@@ -716,9 +775,7 @@
     </div>
 
     <!-- SCHNELL-FILTER NACH ZELLENZAHL (S) -->
-    <div class="s-filter-bar" id="sFilterBar">
-        <!-- Dynamisch generierte S-Buttons -->
-    </div>
+    <div class="s-filter-bar" id="sFilterBar"></div>
 
     <!-- AUSKLAPPBARES EINGABEFORMULAR -->
     <div class="form-card" id="formCard">
@@ -897,9 +954,18 @@
         let editingId = null;
         let activeSFilter = 'ALL';
 
-        function toggleCheatSheet() {
-            const card = document.getElementById('cheatCard');
-            card.style.display = (card.style.display === 'none' || card.style.display === '') ? 'block' : 'none';
+        function toggleCheatSheet(cardId) {
+            const target = document.getElementById(cardId);
+            const isOpen = target.style.display === 'block';
+            
+            // Beide Karten schließen
+            document.getElementById('cheatCard').style.display = 'none';
+            document.getElementById('ohmCard').style.display = 'none';
+
+            // Wenn die gewählte Karte zu war, jetzt öffnen
+            if (!isOpen) {
+                target.style.display = 'block';
+            }
         }
 
         function toggleForm() {
@@ -1128,7 +1194,6 @@
                     const chargeAmp = ((b.capacity * (b.chargeRate || 1)) / 1000).toFixed(1);
                     const typeClass = `type-${(b.type || 'lipo').toLowerCase()}`;
                     
-                    // STATUS BADGES: Flugbereit wird bewusst ausgeblendet
                     let statusBadgeHtml = '';
                     if (b.status === 'storage') {
                         statusBadgeHtml = `<span class="status-badge status-storage">🟡 Storage</span>`;
