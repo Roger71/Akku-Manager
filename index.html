@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Akku Manager">
     <meta name="theme-color" content="#f2f2f7">
 
-    <link rel="icon" type="image/png" id="favicon">
+    <link rel="icon" type="image/svg+xml" id="favicon">
     <link rel="apple-touch-icon" id="appleTouchIcon">
 
     <style>
@@ -67,18 +67,21 @@
         }
 
         .header-icon-box {
-            width: 46px;
-            height: 46px;
+            width: 48px;
+            height: 48px;
             flex-shrink: 0;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            background: #121318;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            background: #0f1218;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .header-icon-box svg {
-            width: 46px;
-            height: 46px;
+            width: 48px;
+            height: 48px;
             display: block;
         }
 
@@ -868,46 +871,126 @@
     </div>
 
     <script>
-        // --- SVG ICON GENERATION ---
+        // --- ULTRA-MODERN 512x512 HIGH-RES HOMESCREEN ICON SVG ---
         const cnhlGPlusIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
             <defs>
-                <linearGradient id="cnhl-bg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#181a20"/>
-                    <stop offset="100%" stop-color="#0a0b0e"/>
+                <!-- Background Gradient -->
+                <linearGradient id="bgGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1e2638"/>
+                    <stop offset="50%" stop-color="#0d111a"/>
+                    <stop offset="100%" stop-color="#05070b"/>
                 </linearGradient>
-                <linearGradient id="cnhl-green" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#84cc16"/>
-                    <stop offset="100%" stop-color="#15803d"/>
+
+                <!-- Neon Border Gradient -->
+                <linearGradient id="borderGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00a2ff"/>
+                    <stop offset="50%" stop-color="#0066ff"/>
+                    <stop offset="100%" stop-color="#7000ff"/>
                 </linearGradient>
-                <linearGradient id="xt60-grad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#f59e0b"/>
-                    <stop offset="100%" stop-color="#b45309"/>
+
+                <!-- Battery Pack Carbon Body -->
+                <linearGradient id="packGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#2a2e3d"/>
+                    <stop offset="100%" stop-color="#12151f"/>
                 </linearGradient>
-                <linearGradient id="pack-body" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#27272a"/>
-                    <stop offset="100%" stop-color="#09090b"/>
+
+                <!-- XT60 Plug Gold/Yellow Gradient -->
+                <linearGradient id="xt60Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ffcc00"/>
+                    <stop offset="100%" stop-color="#d97706"/>
                 </linearGradient>
+
+                <!-- Cable Colors -->
+                <linearGradient id="redWire" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#ef4444"/>
+                    <stop offset="100%" stop-color="#991b1b"/>
+                </linearGradient>
+                <linearGradient id="blackWire" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#4b5563"/>
+                    <stop offset="100%" stop-color="#111827"/>
+                </linearGradient>
+
+                <!-- Lightning Glow Filter -->
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="8" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
             </defs>
-            <rect width="512" height="512" rx="115" fill="url(#cnhl-bg)"/>
-            <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#84cc16" stroke-opacity="0.25" stroke-width="3"/>
-            <g>
-                <path d="M 220 135 C 210 70, 270 65, 295 55" stroke="#ef4444" stroke-width="20" fill="none" stroke-linecap="round"/>
-                <path d="M 185 135 C 175 55, 235 50, 260 40" stroke="#3f3f46" stroke-width="20" fill="none" stroke-linecap="round"/>
-                <rect x="275" y="28" width="58" height="40" rx="8" fill="url(#xt60-grad)" transform="rotate(-15 300 48)"/>
-                <rect x="110" y="125" width="292" height="310" rx="26" fill="url(#pack-body)"/>
-                <rect x="110" y="125" width="292" height="48" rx="26" fill="#18181b"/>
-                <path d="M 110 210 L 402 180 L 402 225 L 110 255 Z" fill="url(#cnhl-green)"/>
-                <text x="145" y="286" fill="#ffffff" font-family="-apple-system, sans-serif" font-weight="900" font-size="36" letter-spacing="2">CNHL</text>
+
+            <!-- App Icon Base -->
+            <rect width="512" height="512" rx="115" fill="url(#bgGlow)"/>
+            <rect x="8" y="8" width="496" height="496" rx="107" fill="none" stroke="url(#borderGlow)" stroke-width="6" stroke-opacity="0.8"/>
+
+            <!-- Subtle Carbon/Grid Pattern Overlay -->
+            <path d="M 0 128 L 512 128 M 0 256 L 512 256 M 0 384 L 512 384 M 128 0 L 128 512 M 256 0 L 256 512 M 384 0 L 384 512" stroke="#ffffff" stroke-opacity="0.03" stroke-width="2"/>
+
+            <!-- Silicone Wires & XT60 Plug -->
+            <g transform="translate(0, -10)">
+                <!-- Red Wire (+) -->
+                <path d="M 220 160 C 210 80, 290 70, 320 50" stroke="url(#redWire)" stroke-width="22" fill="none" stroke-linecap="round"/>
+                <!-- Black Wire (-) -->
+                <path d="M 180 160 C 170 65, 250 55, 280 35" stroke="url(#blackWire)" stroke-width="22" fill="none" stroke-linecap="round"/>
+                
+                <!-- XT60 Main Connector -->
+                <path d="M 290 20 L 345 35 C 352 37, 356 44, 354 51 L 340 100 C 338 107, 331 111, 324 109 L 269 94 C 262 92, 258 85, 260 78 L 274 29 C 276 22, 283 18, 290 20 Z" fill="url(#xt60Grad)"/>
+                <!-- XT60 Terminals -->
+                <circle cx="300" cy="52" r="8" fill="#1e293b"/>
+                <circle cx="325" cy="70" r="8" fill="#1e293b"/>
+            </g>
+
+            <!-- LiPo Battery Body -->
+            <g transform="translate(0, 10)">
+                <!-- Shadow -->
+                <rect x="90" y="150" width="332" height="310" rx="28" fill="#000000" fill-opacity="0.5" filter="blur(10px)"/>
+                
+                <!-- Main Body Outer Frame -->
+                <rect x="90" y="140" width="332" height="310" rx="28" fill="url(#packGrad)" stroke="#374151" stroke-width="3"/>
+                
+                <!-- Top Cap Heatshrink Seal -->
+                <path d="M 90 168 C 90 152.5 102.5 140 118 140 L 394 140 C 409.5 140 422 152.5 422 168 L 422 195 L 90 195 Z" fill="#0f172a"/>
+                <line x1="90" y1="195" x2="422" y2="195" stroke="#00a2ff" stroke-width="2" stroke-opacity="0.6"/>
+
+                <!-- Balance Cable Port Accent -->
+                <rect x="120" y="158" width="60" height="18" rx="4" fill="#e2e8f0"/>
+                <rect x="126" y="162" width="8" height="10" fill="#64748b"/>
+                <rect x="138" y="162" width="8" height="10" fill="#64748b"/>
+                <rect x="150" y="162" width="8" height="10" fill="#64748b"/>
+                <rect x="162" y="162" width="8" height="10" fill="#64748b"/>
+
+                <!-- Dynamic Lightning Energy Symbol -->
+                <path d="M 275 210 L 210 310 L 255 310 L 235 410 L 310 295 L 265 295 Z" fill="#00f0ff" filter="url(#glow)"/>
+                <path d="M 275 210 L 210 310 L 255 310 L 235 410 L 310 295 L 265 295 Z" fill="#ffffff"/>
+
+                <!-- Capacity & Voltage Tech Badge Overlay -->
+                <rect x="114" y="380" width="284" height="48" rx="14" fill="#090d14" fill-opacity="0.85" stroke="#1e293b" stroke-width="2"/>
+                <text x="134" y="412" fill="#00f0ff" font-family="-apple-system, sans-serif" font-weight="900" font-size="22" letter-spacing="1">6S 22.2V</text>
+                <text x="378" y="412" fill="#ffffff" font-family="-apple-system, sans-serif" font-weight="800" font-size="20" text-anchor="end" letter-spacing="0.5">ROGER</text>
             </g>
         </svg>`;
 
+        // Render Header Icon
         document.getElementById('headerIcon').innerHTML = cnhlGPlusIcon;
 
-        // Set Favicon and Apple Touch Icon dynamically
+        // Set Favicon (SVG)
         const svgBlob = new Blob([cnhlGPlusIcon], {type: 'image/svg+xml'});
         const svgUrl = URL.createObjectURL(svgBlob);
         document.getElementById('favicon').href = svgUrl;
-        document.getElementById('appleTouchIcon').href = svgUrl;
+
+        // Convert SVG to High-Res PNG Data-URL for iOS Homescreen Icon Compatibility
+        (function generateAppleTouchIcon() {
+            const img = new Image();
+            const svgDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(cnhlGPlusIcon);
+            img.src = svgDataUrl;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, 512, 512);
+                const pngUrl = canvas.toDataURL('image/png');
+                document.getElementById('appleTouchIcon').href = pngUrl;
+            };
+        })();
 
         // --- APP STATE & INITIAL DATA ---
         const initialBatteries = [
