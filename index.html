@@ -1,1868 +1,1502 @@
 <!DOCTYPE html>
-
-<html lang="de">
-
+<html lang="de" class="h-full bg-slate-100">
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
-    <title>Roger’s Akku Manager</title>
-
+    <title>Roger’s Akku Manager - LiPo Verwaltung</title>
     
-
+    <!-- PWA & Mobile Viewport Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Akku Manager">
+    <meta name="theme-color" content="#f8fafc">
 
-    <meta name="theme-color" content="#f2f2f7">
+    <!-- Favicon Links (Will be updated dynamically via JS data URLs) -->
+    <link rel="icon" type="image/svg+xml" id="dynamicFavicon">
+    <link rel="apple-touch-icon" id="dynamicAppleIcon">
 
-
-
-    <link rel="icon" type="image/svg+xml" id="favicon">
-
-    <link rel="apple-touch-icon" id="appleTouchIcon">
-
-
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        ios: {
+                            bg: '#f1f5f9',
+                            card: '#ffffff',
+                            blue: '#0066ff',
+                            blueHover: '#0052cc',
+                            green: '#34c759',
+                            orange: '#ff9500',
+                            red: '#ff3b30',
+                            purple: '#af52de',
+                            grayBg: '#e2e8f0',
+                        }
+                    },
+                    boxShadow: {
+                        'ios-sm': '0 2px 8px rgba(15, 23, 42, 0.04)',
+                        'ios-md': '0 8px 24px rgba(15, 23, 42, 0.08)',
+                        'ios-lg': '0 16px 36px rgba(15, 23, 42, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-
-        :root {
-
-            --bg-color: #f2f2f7;
-
-            --card-bg: #ffffff;
-
-            --primary: #0066ff;
-
-            --primary-light: #e8f0fe;
-
-            --success: #34c759;
-
-            --success-light: #e8f8ec;
-
-            --warning: #ff9500;
-
-            --warning-light: #fff5e6;
-
-            --danger: #ff3b30;
-
-            --danger-light: #ffe5e5;
-
-            --text-dark: #1c1c1e;
-
-            --text-muted: #8e8e93;
-
-            --border-color: rgba(60, 60, 67, 0.12);
-
-            --radius-lg: 18px;
-
-            --radius-md: 12px;
-
-            --radius-sm: 8px;
-
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-
+        /* Custom iOS Glassmorphism and Smooth Transitions */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 99px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        .ios-glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
-
-
-        * {
-
-            box-sizing: border-box;
-
-            -webkit-tap-highlight-color: transparent;
-
-        }
-
-
-
-        body {
-
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-
-            background-color: var(--bg-color);
-
-            color: var(--text-dark);
-
-            margin: 0;
-
-            padding: calc(12px + env(safe-area-inset-top)) 12px calc(40px + env(safe-area-inset-bottom)) 12px;
-
-            max-width: 650px;
-
-            margin-left: auto;
-
-            margin-right: auto;
-
-            -webkit-font-smoothing: antialiased;
-
-        }
-
-
-
-        /* HEADER */
-
-        header {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            margin: 8px 4px 12px 4px;
-
-        }
-
-
-
-        .header-left {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-        }
-
-
-
-        .header-icon-box {
-
-            width: 48px;
-
-            height: 48px;
-
-            flex-shrink: 0;
-
-            border-radius: 12px;
-
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-
-            background: #ffffff;
-
-            overflow: hidden;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-        }
-
-
-
-        .header-icon-box svg {
-
-            width: 48px;
-
-            height: 48px;
-
-            display: block;
-
-        }
-
-
-
-        .header-text h1 {
-
-            font-size: 19px;
-
-            font-weight: 800;
-
-            letter-spacing: -0.4px;
-
-            margin: 0 0 2px 0;
-
-            line-height: 1.1;
-
-        }
-
-
-
-        .header-text p {
-
-            font-size: 12px;
-
-            color: var(--text-muted);
-
-            margin: 0;
-
-            font-weight: 500;
-
-        }
-
-
-
-        .header-actions {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-        }
-
-
-
-        .btn-add-header {
-
-            width: 40px;
-
-            height: 40px;
-
-            border-radius: 50%;
-
-            background: var(--primary);
-
-            color: white;
-
-            border: none;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 20px;
-
-            cursor: pointer;
-
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.35);
-
-            transition: transform 0.2s ease, background-color 0.2s ease;
-
-        }
-
-
-
-        .btn-add-header.active {
-
-            background: #e5e5ea;
-
-            color: var(--text-dark);
-
-            box-shadow: none;
-
-            transform: rotate(90deg);
-
-        }
-
-
-
-        /* SPICKZETTEL BUTTONS GRID */
-
-        .cheat-buttons-row {
-
-            display: grid;
-
-            grid-template-columns: 1fr 1fr;
-
-            gap: 8px;
-
-            margin-bottom: 12px;
-
-        }
-
-
-
-        .btn-cheat-toggle {
-
-            width: 100%;
-
-            background: var(--card-bg);
-
-            border: 1px solid var(--border-color);
-
-            border-radius: var(--radius-md);
-
-            padding: 10px 6px;
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-            color: var(--text-dark);
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 4px;
-
-            cursor: pointer;
-
-            box-shadow: var(--shadow-sm);
-
-            transition: background 0.2s;
-
-        }
-
-
-
-        .btn-cheat-toggle:active {
-
-            background: #e5e5ea;
-
-        }
-
-
-
-        /* SPICKZETTEL CARD */
-
-        .cheat-card {
-
-            background: var(--card-bg);
-
-            border-radius: var(--radius-lg);
-
-            padding: 14px;
-
-            margin-bottom: 14px;
-
-            box-shadow: var(--shadow-md);
-
-            border: 1px solid var(--border-color);
-
+        .no-scrollbar::-webkit-scrollbar {
             display: none;
-
-            animation: slideDown 0.25s ease;
-
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
-
-
-        .voltage-table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-
-            font-size: 12px;
-
-            text-align: left;
-
+        .active-tap {
+            transition: transform 0.1s ease, opacity 0.1s ease;
+        }
+        .active-tap:active {
+            transform: scale(0.96);
+            opacity: 0.9;
         }
 
-
-
-        .voltage-table th {
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-
-            color: var(--text-muted);
-
-            padding: 6px 4px;
-
-            border-bottom: 1px solid var(--border-color);
-
+        /* Modal Slide Animation */
+        @keyframes modalSlideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up {
+            animation: modalSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-
-
-        .voltage-table td {
-
-            padding: 8px 4px;
-
-            border-bottom: 1px solid var(--border-color);
-
-            font-weight: 600;
-
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
         }
-
-
-
-        .voltage-table tr:last-child td {
-
-            border-bottom: none;
-
+        .animate-fade-in {
+            animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
-
-
-        .voltage-min-load {
-
-            color: var(--danger);
-
-            font-weight: 800;
-
-            background: var(--danger-light);
-
-            padding: 2px 6px;
-
-            border-radius: 6px;
-
-            display: inline-block;
-
-        }
-
-
-
-        .formula-highlight {
-
-            font-weight: 800;
-
-            padding: 2px 6px;
-
-            border-radius: 6px;
-
-            display: inline-block;
-
-            font-size: 11px;
-
-        }
-
-
-
-        /* SEARCH BAR & COMPACT INLINE STAT */
-
-        .search-inline-container {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            margin-bottom: 8px;
-
-        }
-
-
-
-        .search-input {
-
-            flex: 1;
-
-            width: 100%;
-
-            padding: 10px 14px;
-
-            border-radius: var(--radius-md);
-
-            border: 1px solid var(--border-color);
-
-            background: var(--card-bg);
-
-            font-size: 14px;
-
-            outline: none;
-
-            box-shadow: var(--shadow-sm);
-
-        }
-
-
-
-        .stat-inline-badge {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 6px;
-
-            background: var(--card-bg);
-
-            border: 1px solid var(--border-color);
-
-            border-radius: var(--radius-md);
-
-            padding: 9px 12px;
-
-            box-shadow: var(--shadow-sm);
-
-            white-space: nowrap;
-
-            flex-shrink: 0;
-
-            height: 42px;
-
-        }
-
-
-
-        .stat-inline-value {
-
-            font-size: 15px;
-
-            font-weight: 800;
-
-            color: var(--primary);
-
-            line-height: 1;
-
-        }
-
-
-
-        .stat-inline-label {
-
-            font-size: 11px;
-
-            font-weight: 700;
-
-            color: var(--text-muted);
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.3px;
-
-        }
-
-
-
-        /* QUICK FILTERS */
-
-        .s-filter-bar {
-
-            display: flex;
-
-            gap: 6px;
-
-            overflow-x: auto;
-
-            padding-bottom: 4px;
-
-            margin-bottom: 14px;
-
-            -webkit-overflow-scrolling: touch;
-
-        }
-
-
-
-        .s-filter-bar::-webkit-scrollbar {
-
-            display: none;
-
-        }
-
-
-
-        .btn-s-chip {
-
-            background: var(--card-bg);
-
-            border: 1px solid var(--border-color);
-
-            border-radius: 18px;
-
-            padding: 6px 14px;
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-            color: var(--text-dark);
-
-            cursor: pointer;
-
-            white-space: nowrap;
-
-            box-shadow: var(--shadow-sm);
-
-            transition: all 0.2s ease;
-
-        }
-
-
-
-        .btn-s-chip.active {
-
-            background: var(--primary);
-
-            color: white;
-
-            border-color: var(--primary);
-
-            box-shadow: 0 2px 8px rgba(0, 102, 255, 0.3);
-
-        }
-
-
-
-        /* FORM CARD */
-
-        .form-card {
-
-            background: var(--card-bg);
-
-            border-radius: var(--radius-lg);
-
-            padding: 18px;
-
-            margin-bottom: 20px;
-
-            box-shadow: var(--shadow-md);
-
-            border: 1px solid var(--border-color);
-
-            display: none;
-
-            animation: slideDown 0.25s ease;
-
-        }
-
-
-
-        @keyframes slideDown {
-
-            from { opacity: 0; transform: translateY(-8px); }
-
-            to { opacity: 1; transform: translateY(0); }
-
-        }
-
-
-
-        .form-header {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            margin-bottom: 14px;
-
-        }
-
-
-
-        .card-title {
-
-            font-size: 16px;
-
-            font-weight: 700;
-
-            margin: 0;
-
-        }
-
-
-
-        .btn-close-form {
-
-            background: #f2f2f7;
-
-            border: none;
-
-            width: 28px;
-
-            height: 28px;
-
-            border-radius: 50%;
-
-            font-size: 13px;
-
-            color: var(--text-muted);
-
-            cursor: pointer;
-
-        }
-
-
-
-        .grid-form {
-
-            display: grid;
-
-            grid-template-columns: 1fr 1fr;
-
-            gap: 12px;
-
-        }
-
-
-
-        .full-width { grid-column: span 2; }
-
-
-
-        .form-group {
-
-            display: flex;
-
-            flex-direction: column;
-
-        }
-
-
-
-        label {
-
-            font-size: 11px;
-
-            font-weight: 700;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.5px;
-
-            color: var(--text-muted);
-
-            margin-bottom: 5px;
-
-            margin-left: 2px;
-
-        }
-
-
-
-        input, select {
-
-            width: 100%;
-
-            padding: 10px 12px;
-
-            border: 1px solid var(--border-color);
-
-            border-radius: var(--radius-md);
-
-            font-size: 15px;
-
-            font-weight: 500;
-
-            background-color: #f9f9fb;
-
-            color: var(--text-dark);
-
-            outline: none;
-
-            -webkit-appearance: none;
-
-        }
-
-
-
-        select {
-
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238E8E93%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-
-            background-repeat: no-repeat;
-
-            background-position: right 12px top 50%;
-
-            background-size: 10px auto;
-
-            padding-right: 28px;
-
-        }
-
-
-
-        input:focus, select:focus {
-
-            border-color: var(--primary);
-
-            background-color: #ffffff;
-
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
-
-        }
-
-
-
-        .quick-buttons {
-
-            display: flex;
-
-            flex-wrap: wrap;
-
-            gap: 6px;
-
-            margin-top: 8px;
-
-        }
-
-
-
-        .btn-chip {
-
-            background: #eef0f5;
-
-            border: none;
-
-            border-radius: 20px;
-
-            padding: 5px 10px;
-
-            font-size: 12px;
-
-            font-weight: 600;
-
-            color: #4a4a4f;
-
-            cursor: pointer;
-
-        }
-
-
-
-        .form-actions {
-
-            display: flex;
-
-            gap: 10px;
-
-            margin-top: 16px;
-
-        }
-
-
-
-        button.btn-add {
-
-            flex: 1;
-
-            background: linear-gradient(180deg, #0071e3 0%, #005bb5 100%);
-
-            color: white;
-
-            border: none;
-
-            padding: 13px;
-
-            border-radius: var(--radius-md);
-
-            font-size: 15px;
-
-            font-weight: 700;
-
-            cursor: pointer;
-
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
-
-        }
-
-
-
-        button.btn-cancel {
-
-            background: #e5e5ea;
-
-            color: var(--text-dark);
-
-            border: none;
-
-            padding: 13px 16px;
-
-            border-radius: var(--radius-md);
-
-            font-size: 14px;
-
-            font-weight: 600;
-
-            cursor: pointer;
-
-        }
-
-
-
-        /* LIST HEADERS & ITEM CARDS */
-
-        .section-header {
-
-            font-size: 15px;
-
-            font-weight: 800;
-
-            margin: 18px 0 8px 4px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-        }
-
-
-
-        .section-badge {
-
-            background: #e2e8f0;
-
-            color: #475569;
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-            padding: 2px 8px;
-
-            border-radius: 10px;
-
-        }
-
-
-
-        .table-container {
-
-            background: var(--card-bg);
-
-            border-radius: var(--radius-lg);
-
-            overflow: hidden;
-
-            box-shadow: var(--shadow-sm);
-
-            border: 1px solid var(--border-color);
-
-            margin-bottom: 14px;
-
-        }
-
-
-
-        .battery-item {
-
-            padding: 12px 14px;
-
-            border-bottom: 1px solid var(--border-color);
-
-        }
-
-
-
-        .battery-item:last-child { border-bottom: none; }
-
-
-
-        .battery-main-row {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            margin-bottom: 6px;
-
-        }
-
-
-
-        .akku-title {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 6px;
-
-            flex-wrap: wrap;
-
-        }
-
-
-
-        .mfg-cap-line {
-
-            display: inline-flex;
-
-            align-items: baseline;
-
-            gap: 6px;
-
-            white-space: nowrap;
-
-        }
-
-
-
-        .type-badge {
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            padding: 2px 7px;
-
-            border-radius: 6px;
-
-            text-transform: uppercase;
-
-        }
-
-
-
-        .type-lipo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
-
-        .type-lihv { background: #faf5ff; color: #7e22ce; border: 1px solid #f3e8ff; }
-
-        .type-life { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
-
-        .type-liion { background: #ecfeff; color: #0e7490; border: 1px solid #cff4fc; }
-
-
-
-        .status-badge {
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            padding: 2px 6px;
-
-            border-radius: 6px;
-
-            text-transform: uppercase;
-
-        }
-
-        .status-storage { background: var(--warning-light); color: #b45309; }
-
-        .status-retired { background: var(--danger-light); color: var(--danger); }
-
-
-
-        .qty-badge {
-
-            background: #71717a;
-
-            color: white;
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            padding: 2px 6px;
-
-            border-radius: 10px;
-
-        }
-
-
-
-        .manufacturer-tag {
-
-            font-size: 14px;
-
-            font-weight: 700;
-
-            color: #334155;
-
-        }
-
-
-
-        .cap-tag {
-
-            color: var(--primary);
-
-            font-weight: 800;
-
-            font-size: 16px;
-
-        }
-
-
-
-        .battery-data-row {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            flex-wrap: wrap;
-
-            font-size: 12px;
-
-            color: var(--text-muted);
-
-        }
-
-
-
-        .data-badge {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 3px;
-
-            font-size: 12px;
-
-            color: #475569;
-
-        }
-
-
-
-        .charge-amp-highlight {
-
-            background: #eff6ff;
-
-            color: var(--primary);
-
-            font-weight: 800;
-
-            padding: 2px 6px;
-
-            border-radius: 6px;
-
-            border: 1px solid #dbeafe;
-
-        }
-
-
-
-        .data-badge strong { font-weight: 700; color: var(--text-dark); }
-
-
-
-        .action-btns {
-
-            display: flex;
-
-            gap: 6px;
-
-        }
-
-
-
-        .btn-action {
-
-            border: none;
-
-            width: 30px;
-
-            height: 30px;
-
-            border-radius: 50%;
-
-            font-size: 12px;
-
-            cursor: pointer;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-        }
-
-
-
-        .btn-edit { background: var(--primary-light); color: var(--primary); }
-
-        .btn-del { background: var(--danger-light); color: var(--danger); }
-
-
-
-        .empty-state {
-
-            text-align: center;
-
-            padding: 35px 20px;
-
-            color: var(--text-muted);
-
-            background: var(--card-bg);
-
-            border-radius: var(--radius-lg);
-
-            border: 1px solid var(--border-color);
-
-        }
-
-
-
-        .btn-empty-add {
-
-            margin-top: 12px;
-
-            background: var(--primary);
-
-            color: white;
-
-            border: none;
-
-            padding: 9px 16px;
-
-            border-radius: 18px;
-
-            font-size: 13px;
-
-            font-weight: 700;
-
-            cursor: pointer;
-
-        }
-
-
-
-        /* BACKUP FOOTER */
-
-        .backup-bar {
-
-            background: var(--card-bg);
-
-            border: 1px solid var(--border-color);
-
-            border-radius: var(--radius-md);
-
-            padding: 10px 14px;
-
-            margin-top: 24px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            box-shadow: var(--shadow-sm);
-
-        }
-
-
-
-        .backup-title {
-
-            font-size: 11px;
-
-            font-weight: 700;
-
-            color: var(--text-muted);
-
-            text-transform: uppercase;
-
-        }
-
-
-
-        .backup-actions { display: flex; gap: 8px; }
-
-
-
-        .btn-secondary-sm {
-
-            background: #eef0f5;
-
-            color: var(--text-dark);
-
-            border: none;
-
-            padding: 6px 11px;
-
-            border-radius: var(--radius-sm);
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-            cursor: pointer;
-
-        }
-
     </style>
-
 </head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-full pb-20 selection:bg-blue-500 selection:text-white">
 
-<body>
-
-
-
-    <header>
-
-        <div class="header-left">
-
-            <div class="header-icon-box" id="headerIcon"></div>
-
-            <div class="header-text">
-
-                <h1>Roger’s Akku Manager</h1>
-
-                <p>Akkus einfach & präzise verwalten</p>
-
+    <!-- iOS Top Navigation Header -->
+    <header class="sticky top-0 z-30 ios-glass border-b border-slate-200/80 px-4 py-3 sm:px-6 shadow-ios-sm">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+            
+            <!-- Left Branding with Exact Custom SVG Icon -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="openAppInfoModal()">
+                <div id="headerIconContainer" class="w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0 drop-shadow-md hover:scale-105 transition-transform">
+                    <!-- SVG injected dynamically -->
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                        Roger’s Akku Manager
+                    </h1>
+                    <p class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                        LiPo & Akku-Flotte
+                    </p>
+                </div>
             </div>
 
+            <!-- Right Header Actions -->
+            <div class="flex items-center gap-2">
+                <button onclick="openTechGuidesModal()" class="active-tap hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50">
+                    <span>⚡ Spickzettel</span>
+                </button>
+                <button onclick="openAppInfoModal()" class="active-tap flex items-center justify-center w-10 h-10 text-slate-600 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50" title="App Info & PWA">
+                    <span class="text-lg">ℹ️</span>
+                </button>
+                <button onclick="openAddBatteryModal()" class="active-tap bg-blue-600 hover:bg-blue-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md shadow-blue-500/25">
+                    <span class="text-base font-black">＋</span>
+                    <span>Neuer Akku</span>
+                </button>
+            </div>
         </div>
-
-        <div class="header-actions">
-
-            <button class="btn-add-header" id="toggleFormBtn" onclick="toggleForm()" aria-label="Neuer Akku">
-
-                <span id="addIconSymbol">＋</span>
-
-            </button>
-
-        </div>
-
     </header>
 
+    <!-- Main App Container -->
+    <main class="max-w-4xl mx-auto px-3 sm:px-6 pt-4 space-y-4">
 
+        <!-- Fleet KPI Stats Summary Card -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-ios-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📊</span>
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Flotten-Übersicht</h2>
+                </div>
+                <button onclick="openTechGuidesModal()" class="sm:hidden text-xs font-bold text-blue-600 flex items-center gap-1">
+                    ⚡ Spickzettel & Guide ➔
+                </button>
+            </div>
 
-    <!-- SPICKZETTEL BUTTONS -->
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
+                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <span class="text-xs text-slate-500 font-medium block">Akkus Gesamt</span>
+                    <div class="flex items-baseline gap-1 mt-0.5">
+                        <span id="statTotalCount" class="text-xl sm:text-2xl font-black text-slate-900">0</span>
+                        <span id="statPacksCount" class="text-xs font-bold text-slate-400">(0 Packs)</span>
+                    </div>
+                </div>
 
-    <div class="cheat-buttons-row">
+                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <span class="text-xs text-slate-500 font-medium block">Energie Kapazität</span>
+                    <div class="mt-0.5">
+                        <span id="statTotalEnergy" class="text-xl sm:text-2xl font-black text-blue-600">0 Wh</span>
+                    </div>
+                </div>
 
-        <button type="button" class="btn-cheat-toggle" onclick="toggleCheatSheet('cheatCard')">
+                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <span class="text-xs text-slate-500 font-medium block">Gesamtgewicht</span>
+                    <div class="mt-0.5">
+                        <span id="statTotalWeight" class="text-xl sm:text-2xl font-black text-slate-800">0 kg</span>
+                    </div>
+                </div>
 
-            <span>⚡ Spannung</span>
-
-        </button>
-
-        <button type="button" class="btn-cheat-toggle" onclick="toggleCheatSheet('ohmCard')">
-
-            <span>🔋 Innenwiderstand</span>
-
-        </button>
-
-    </div>
-
-
-
-    <!-- SPANNUNGS-SPICKZETTEL -->
-
-    <div class="cheat-card" id="cheatCard">
-
-        <div class="form-header" style="margin-bottom: 8px;">
-
-            <h3 class="card-title">⚡ Zellenspannungen Referenz</h3>
-
-            <button type="button" class="btn-close-form" onclick="toggleCheatSheet('cheatCard')">✕</button>
-
+                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <span class="text-xs text-slate-500 font-medium block">Status Verteilung</span>
+                    <div class="flex items-center gap-2 mt-1.5 text-xs font-bold">
+                        <span id="statFullCount" class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-md" title="Voll geladen">🟢 0</span>
+                        <span id="statStorageCount" class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-md" title="Storage">🟡 0</span>
+                        <span id="statEmptyCount" class="bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded-md" title="Leer / Ladebedarf">🔴 0</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <table class="voltage-table">
+        <!-- Search & Filter Controls Section -->
+        <div class="space-y-3">
+            <!-- Search & Sort Row -->
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        🔍
+                    </span>
+                    <input type="text" id="searchInput" oninput="handleSearchInput()" placeholder="Suche nach Name, Stecker, Box, Modell (z.B. XT90, Tucano, CNHL)..." class="w-full pl-10 pr-9 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 shadow-ios-sm">
+                    <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                        ✕
+                    </button>
+                </div>
 
-            <thead>
+                <div class="flex gap-2">
+                    <select id="sortSelect" onchange="render()" class="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 shadow-ios-sm">
+                        <option value="cells_desc">Sortierung: Zellen (S) ⬇</option>
+                        <option value="cells_asc">Sortierung: Zellen (S) ⬆</option>
+                        <option value="capacity_desc">Kapazität (mAh) ⬇</option>
+                        <option value="capacity_asc">Kapazität (mAh) ⬆</option>
+                        <option value="energy_desc">Energie (Wh) ⬇</option>
+                        <option value="status">Status (Ladebedarf zuerst)</option>
+                        <option value="name">Hersteller / Name</option>
+                        <option value="cycles_desc">Zyklenanzahl ⬇</option>
+                    </select>
+                </div>
+            </div>
 
-                <tr>
+            <!-- Fast S-Cell Count Filter Pills -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" id="cellFilterBar">
+                <!-- Injected via JavaScript -->
+            </div>
 
-                    <th>Typ</th>
-
-                    <th>V-Max</th>
-
-                    <th>Storage</th>
-
-                    <th>V-Min</th>
-
-                    <th>Min. Last</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <tr>
-
-                    <td><strong>LiPo</strong></td>
-
-                    <td>4.20 V</td>
-
-                    <td>3.80–3.85 V</td>
-
-                    <td>3.30 V</td>
-
-                    <td><span class="voltage-min-load">3.00 V</span></td>
-
-                </tr>
-
-                <tr>
-
-                    <td><strong>LiHV</strong></td>
-
-                    <td>4.35 V</td>
-
-                    <td>3.80–3.85 V</td>
-
-                    <td>3.30 V</td>
-
-                    <td><span class="voltage-min-load">3.00 V</span></td>
-
-                </tr>
-
-                <tr>
-
-                    <td><strong>LiFe</strong></td>
-
-                    <td>3.60 V</td>
-
-                    <td>3.20–3.30 V</td>
-
-                    <td>2.80 V</td>
-
-                    <td><span class="voltage-min-load">2.50 V</span></td>
-
-                </tr>
-
-                <tr>
-
-                    <td><strong>LiIon</strong></td>
-
-                    <td>4.20 V</td>
-
-                    <td>3.60–3.70 V</td>
-
-                    <td>2.80 V</td>
-
-                    <td><span class="voltage-min-load">2.50 V</span></td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-
-
-    <!-- INNENWIDERSTAND (mΩ) SPICKZETTEL -->
-
-    <div class="cheat-card" id="ohmCard">
-
-        <div class="form-header" style="margin-bottom: 8px;">
-
-            <h3 class="card-title">🔋 Innenwiderstand (mΩ) pro Zelle</h3>
-
-            <button type="button" class="btn-close-form" onclick="toggleCheatSheet('ohmCard')">✕</button>
-
+            <!-- Status Filter Pills -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" id="statusFilterBar">
+                <!-- Injected via JavaScript -->
+            </div>
         </div>
 
-        <table class="voltage-table">
-
-            <thead>
-
-                <tr>
-
-                    <th>mΩ / Zelle</th>
-
-                    <th>Zustand</th>
-
-                    <th>Einsatzbereich</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <tr>
-
-                    <td><strong>&lt; 3 mΩ</strong></td>
-
-                    <td><span class="formula-highlight" style="background:#e8f8ec; color:#15803d;">Top / Neu</span></td>
-
-                    <td>Extreme Lasten, FPV Racing, Jets</td>
-
-                </tr>
-
-                <tr>
-
-                    <td><strong>3 – 7 mΩ</strong></td>
-
-                    <td><span class="formula-highlight" style="background:#e8f0fe; color:#0066ff;">Gut</span></td>
-
-                    <td>Normale Flug-/Fahrzeit, Standard Lasten</td>
-
-                </tr>
-
-                <tr>
-
-                    <td><strong>8 – 15 mΩ</strong></td>
-
-                    <td><span class="formula-highlight" style="background:#fff5e6; color:#b45309;">Mäßig</span></td>
-
-                    <td>Geringe Ströme, Cruisen, Training</td>
-
-                </tr>
-
-                <tr>
-
-                    <td><strong>&gt; 15 mΩ</strong></td>
-
-                    <td><span class="formula-highlight" style="background:#ffe5e5; color:#ff3b30;">Kritisch</span></td>
-
-                    <td>Starker Voltage Sag, wird heiß, Ausmusterung</td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
-        <p style="font-size: 11px; color: var(--text-muted); margin: 10px 2px 0 2px; line-height: 1.35;">
-
-            💡 <strong>Hinweis:</strong> Gemessen bei ~20°C. Kalte Akkus zeigen höhere mΩ-Werte! Größere Akkus (&gt;3000 mAh) haben naturgemäß kleinere mΩ-Werte als kleine Akkus (&lt;1000 mAh).
-
-        </p>
-
-    </div>
-
-
-
-    <!-- SCHNELLSUCHE & KOMPAKTE ANZAHL-ANZEIGE -->
-
-    <div class="search-inline-container">
-
-        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Suche (z. B. CNHL, 1500, Tattu)..." oninput="render()">
-
-        <div class="stat-inline-badge">
-
-            <span class="stat-inline-value" id="statCount">0</span>
-
-            <span class="stat-inline-label">Akkus</span>
-
+        <!-- Battery Grid Container -->
+        <div id="batteryListContainer" class="space-y-4">
+            <!-- Dynamic Battery Cards Rendered Here -->
         </div>
 
-    </div>
+        <!-- Backup & Data Footer Bar -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-ios-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="text-base">💾</span>
+                <div>
+                    <p class="font-bold text-slate-800">Datensicherung & Speicherplatz</p>
+                    <p class="text-slate-500">Alle Daten werden lokal in deinem Browser gespeichert.</p>
+                </div>
+            </div>
 
-
-
-    <!-- SCHNELL-FILTER NACH ZELLENZAHL (S) -->
-
-    <div class="s-filter-bar" id="sFilterBar"></div>
-
-
-
-    <!-- AUSKLAPPBARES EINGABEFORMULAR -->
-
-    <div class="form-card" id="formCard">
-
-        <div class="form-header">
-
-            <h3 class="card-title" id="formTitle">➕ Neuen Akku hinzufügen</h3>
-
-            <button type="button" class="btn-close-form" onclick="hideForm()">✕</button>
-
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+                <button onclick="exportDataJSON()" class="active-tap bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-2 rounded-xl border border-slate-200 flex items-center gap-1">
+                    <span>📥 Export (JSON)</span>
+                </button>
+                <button onclick="triggerImportJSON()" class="active-tap bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-2 rounded-xl border border-slate-200 flex items-center gap-1">
+                    <span>📤 Import</span>
+                </button>
+                <input type="file" id="jsonFileInput" accept=".json" class="hidden" onchange="handleImportJSON(event)">
+                <button onclick="confirmResetData()" class="active-tap text-rose-600 hover:text-rose-700 font-bold px-2 py-2">
+                    Reset
+                </button>
+            </div>
         </div>
 
-        
+    </main>
 
-        <form id="lipoForm" onsubmit="handleSubmit(event)">
+    <!-- MODAL: ADD / EDIT BATTERY -->
+    <div id="batteryModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-xl max-h-[90vh] sm:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up">
+            
+            <!-- Modal Header -->
+            <div class="ios-glass px-5 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-2.5">
+                    <div id="modalIconPreview" class="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0"></div>
+                    <div>
+                        <h3 id="modalTitle" class="text-base font-extrabold text-slate-900">Neuen Akku anlegen</h3>
+                        <p class="text-xs text-slate-500 font-medium">Spezifikationen & Kennzahlen eintragen</p>
+                    </div>
+                </div>
+                <button onclick="closeBatteryModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center font-bold text-sm">
+                    ✕
+                </button>
+            </div>
 
-            <div class="grid-form">
+            <!-- Modal Form Body -->
+            <form id="batteryForm" onsubmit="handleFormSubmit(event)" class="p-5 overflow-y-auto space-y-4">
+                
+                <input type="hidden" id="formBatteryId">
 
-                <div class="form-group full-width">
+                <!-- Brand & Name -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                        Hersteller & Modell Name *
+                    </label>
+                    <input type="text" id="formName" required placeholder="z. B. Turnigy Rapid 6S 7000mAh 140C" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <!-- Quick Brand Chips -->
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                        <button type="button" onclick="setBrandPreset('Turnigy')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg">Turnigy</button>
+                        <button type="button" onclick="setBrandPreset('GensAce')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg">GensAce</button>
+                        <button type="button" onclick="setBrandPreset('CNHL')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg">CNHL</button>
+                        <button type="button" onclick="setBrandPreset('SLS')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg">SLS</button>
+                        <button type="button" onclick="setBrandPreset('Tattu')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg">Tattu</button>
+                        <button type="button" onclick="setBrandPreset('Spektrum')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg">Spektrum</button>
+                        <button type="button" onclick="setBrandPreset('Wellpower')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg">Wellpower</button>
+                    </div>
+                </div>
 
-                    <label>Hersteller (Optional)</label>
-
-                    <input type="text" id="manufacturer" placeholder="Name eingeben oder wählen">
-
-                    <div class="quick-buttons">
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('CNHL')">CNHL</button>
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Tattu')">Tattu</button>
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('SLS')">SLS</button>
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Wellpower')">Wellpower</button>
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Turnigy')">Turnigy</button>
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Hacker')">Hacker</button>
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Ovonic')">Ovonic</button>
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Gens ace')">Gens ace</button>
-
-                        <button type="button" class="btn-chip" onclick="setManufacturer('Spektrum')">Spektrum</button>
-
+                <!-- Chemistry & Status Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Chemie Typ
+                        </label>
+                        <select id="formType" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="LiPo" selected>LiPo (4.20V / Zelle)</option>
+                            <option value="LiHV">LiHV High Volt (4.35V)</option>
+                            <option value="LiFe">LiFePO4 (3.60V)</option>
+                            <option value="LiIon">LiIon (4.20V)</option>
+                        </select>
                     </div>
 
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Lade-Zustand
+                        </label>
+                        <select id="formStatus" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="storage" selected>🟡 Lagerspannung (Storage 3.85V)</option>
+                            <option value="ready">🟢 Voll Geladen (100% / 4.20V)</option>
+                            <option value="discharged">🔴 Entladen / Geflogen (3.70V)</option>
+                            <option value="needs_charge">⚡ Ladebedarf für Flugtag</option>
+                            <option value="retired">⛔ Ausgemustert / Defekt</option>
+                        </select>
+                    </div>
                 </div>
 
+                <!-- Cell Count, Capacity, Quantity Grid -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Zellen (S) *
+                        </label>
+                        <input type="number" id="formCells" min="1" max="14" required placeholder="6" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-extrabold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
 
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Kapazität (mAh) *
+                        </label>
+                        <input type="number" id="formCapacity" min="50" max="50000" step="50" required placeholder="7000" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-extrabold text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
 
-                <div class="form-group">
-
-                    <label>Akku Typ</label>
-
-                    <select id="type">
-
-                        <option value="LiPo" selected>LiPo</option>
-
-                        <option value="LiHV">LiHV</option>
-
-                        <option value="LiFe">LiFe</option>
-
-                        <option value="LiIon">LiIon</option>
-
-                    </select>
-
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Stückzahl
+                        </label>
+                        <input type="number" id="formQty" min="1" max="99" value="1" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-extrabold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                 </div>
 
+                <!-- Discharge C-Ratings & Weight Grid -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            C-Rate Cont. *
+                        </label>
+                        <input type="number" id="formCCont" min="5" max="300" required placeholder="140" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
 
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            C-Rate Burst
+                        </label>
+                        <input type="number" id="formCBurst" min="5" max="400" placeholder="280" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
 
-                <div class="form-group">
-
-                    <label>Status</label>
-
-                    <select id="status">
-
-                        <option value="ready" selected>Einsatzbereit</option>
-
-                        <option value="storage">🟡 Storage</option>
-
-                        <option value="retired">🔴 Ausgemustert</option>
-
-                    </select>
-
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Gewicht (g) *
+                        </label>
+                        <input type="number" id="formWeight" min="10" max="10000" step="1" required placeholder="820" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                 </div>
 
+                <!-- Connector, Internal Resistance, Charge C Rate -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Stecker Type
+                        </label>
+                        <select id="formConnector" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="XT90" selected>XT90</option>
+                            <option value="XT60">XT60</option>
+                            <option value="XT30">XT30</option>
+                            <option value="EC5 / IC5">EC5 / IC5</option>
+                            <option value="EC3 / IC3">EC3 / IC3</option>
+                            <option value="Deans T-Plug">Deans T-Plug</option>
+                            <option value="Traxxas TRX">Traxxas TRX</option>
+                            <option value="QS8">QS8 Anti-Spark</option>
+                            <option value="JST-PH / Ultra">JST / Micro</option>
+                        </select>
+                    </div>
 
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1" title="Durchschnittlicher Innenwiderstand pro Zelle in mΩ">
+                            Innenwiderst. (mΩ)
+                        </label>
+                        <input type="number" id="formIR" min="0.1" max="50" step="0.1" placeholder="1.8" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
 
-                <div class="form-group">
-
-                    <label>Kapazität (mAh)</label>
-
-                    <input type="number" id="capacity" placeholder="z. B. 1500" min="50" max="50000" inputmode="numeric" required>
-
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Max Laderate (C)
+                        </label>
+                        <input type="number" id="formChargeC" min="0.5" max="10" step="0.5" value="2.0" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                 </div>
 
+                <!-- Storage Location, Purchase Date, Cycles -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Lagerort / Koffer
+                        </label>
+                        <input type="text" id="formLocation" placeholder="z.B. Safe Box A" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
 
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Zyklen
+                        </label>
+                        <input type="number" id="formCycles" min="0" max="1000" value="0" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
 
-                <div class="form-group">
-
-                    <label>Zellenzahl (S)</label>
-
-                    <input type="number" id="cellCount" placeholder="z. B. 4" min="1" max="14" inputmode="numeric" required>
-
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                            Kaufdatum
+                        </label>
+                        <input type="date" id="formPurchaseDate" class="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                 </div>
 
-
-
-                <div class="form-group">
-
-                    <label>Stückzahl (Anzahl)</label>
-
-                    <input type="number" id="qty" placeholder="1" min="1" max="99" value="1" inputmode="numeric" required>
-
+                <!-- Model Compatibility & Notes -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                        Flugmodell / Einsatzgebiet & Notizen
+                    </label>
+                    <input type="text" id="formNotes" placeholder="z. B. Freewing Avanti S, Super Tucano 1.6m, FPV Quad..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
-
-
-                <div class="form-group">
-
-                    <label>Gewicht pro Akku (g)</label>
-
-                    <input type="number" id="weight" placeholder="z. B. 180" step="0.1" inputmode="decimal" required>
-
+                <!-- Submit Buttons -->
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closeBatteryModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-sm">
+                        Abbrechen
+                    </button>
+                    <button type="submit" id="formSubmitBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 rounded-xl text-sm shadow-lg shadow-blue-500/25">
+                        Speichern
+                    </button>
                 </div>
 
-
-
-                <div class="form-group">
-
-                    <label>Laderate (C)</label>
-
-                    <input type="number" id="chargeRate" placeholder="z. B. 1.0" step="0.1" inputmode="decimal" value="1.0" required>
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label>Entladerate (C)</label>
-
-                    <input type="text" id="dischargeRate" placeholder="z. B. 70 oder 30/70" required>
-
-                </div>
-
-
-
-                <div class="form-group full-width">
-
-                    <label>Kaufdatum (Optional)</label>
-
-                    <input type="date" id="purchaseDate">
-
-                </div>
-
-            </div>
-
-
-
-            <div class="form-actions">
-
-                <button type="button" class="btn-cancel" onclick="hideForm()">Abbrechen</button>
-
-                <button type="submit" class="btn-add" id="submitBtn">Akku Speichern</button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-
-
-    <!-- AKKU LISTE -->
-
-    <div id="batteryList"></div>
-
-
-
-    <!-- BACKUP FOOTER -->
-
-    <div class="backup-bar">
-
-        <span class="backup-title">💾 Datensicherung</span>
-
-        <div class="backup-actions">
-
-            <button class="btn-secondary-sm" onclick="exportData()">📥 Export</button>
-
-            <button class="btn-secondary-sm" onclick="document.getElementById('importFile').click()">📤 Import</button>
-
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-
+            </form>
         </div>
-
     </div>
 
+    <!-- MODAL: TECH GUIDES & VOLTAGE REFERENCE -->
+    <div id="techGuidesModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white w-full max-w-2xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-fade-in">
+            
+            <div class="ios-glass px-5 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl">⚡</span>
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900">LiPo Spickzettel & Referenz-Tabellen</h3>
+                        <p class="text-xs text-slate-500 font-medium">Zellenspannungen, Innenwiderstand & Laderaten</p>
+                    </div>
+                </div>
+                <button onclick="closeTechGuidesModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center font-bold text-sm">
+                    ✕
+                </button>
+            </div>
 
+            <div class="p-5 overflow-y-auto space-y-5 text-sm">
+                
+                <!-- Voltage Reference Table -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+                    <h4 class="font-extrabold text-slate-900 text-sm mb-2 flex items-center gap-1.5">
+                        <span>🔋 Zellenspannungen nach Chemie</span>
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-500 uppercase font-extrabold">
+                                    <th class="py-2 pr-2">Typ</th>
+                                    <th class="py-2 px-2">Voll (100%)</th>
+                                    <th class="py-2 px-2">Storage (50%)</th>
+                                    <th class="py-2 px-2">Nennsp.</th>
+                                    <th class="py-2 pl-2">Min. unter Last</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200/60 font-semibold text-slate-800">
+                                <tr>
+                                    <td class="py-2 pr-2 font-bold text-blue-600">LiPo Standard</td>
+                                    <td class="py-2 px-2 text-emerald-600 font-bold">4.20 V</td>
+                                    <td class="py-2 px-2 text-amber-600 font-bold">3.80 – 3.85 V</td>
+                                    <td class="py-2 px-2">3.70 V</td>
+                                    <td class="py-2 pl-2 text-rose-600 font-bold">3.30 – 3.50 V</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-2 font-bold text-purple-600">LiHV High Volt</td>
+                                    <td class="py-2 px-2 text-emerald-600 font-bold">4.35 V</td>
+                                    <td class="py-2 px-2 text-amber-600 font-bold">3.80 – 3.85 V</td>
+                                    <td class="py-2 px-2">3.80 V</td>
+                                    <td class="py-2 pl-2 text-rose-600 font-bold">3.30 – 3.50 V</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-2 font-bold text-emerald-600">LiFePO4</td>
+                                    <td class="py-2 px-2 text-emerald-600 font-bold">3.60 V</td>
+                                    <td class="py-2 px-2 text-amber-600 font-bold">3.20 – 3.30 V</td>
+                                    <td class="py-2 px-2">3.30 V</td>
+                                    <td class="py-2 pl-2 text-rose-600 font-bold">2.80 V</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-2 font-bold text-cyan-600">LiIon 18650/21700</td>
+                                    <td class="py-2 px-2 text-emerald-600 font-bold">4.20 V</td>
+                                    <td class="py-2 px-2 text-amber-600 font-bold">3.60 – 3.70 V</td>
+                                    <td class="py-2 px-2">3.60 V</td>
+                                    <td class="py-2 pl-2 text-rose-600 font-bold">2.80 – 3.00 V</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Internal Resistance Guide -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+                    <h4 class="font-extrabold text-slate-900 text-sm mb-2 flex items-center gap-1.5">
+                        <span>🧪 Innenwiderstand (IR in mΩ pro Zelle) Bewertung</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                            <p class="font-black text-emerald-800 text-xs uppercase">🟢 &lt; 3.0 mΩ – Neuwertig / Top</p>
+                            <p class="text-emerald-700 mt-0.5">Höchste Stromabgabe, FPV Racing & Impeller Jets.</p>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-blue-50 border border-blue-200">
+                            <p class="font-black text-blue-800 text-xs uppercase">🔵 3.0 – 7.0 mΩ – Gut / Normal</p>
+                            <p class="text-blue-700 mt-0.5">Normale Gebrauchspackung für Flugzeuge & Copter.</p>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200">
+                            <p class="font-black text-amber-800 text-xs uppercase">🟡 7.1 – 15.0 mΩ – Mäßig</p>
+                            <p class="text-amber-700 mt-0.5">Spürbarer Spannungseinbruch (Voltage Sag) unter Vollgas.</p>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200">
+                            <p class="font-black text-rose-800 text-xs uppercase">🔴 &gt; 15.0 mΩ – Kritisch</p>
+                            <p class="text-rose-700 mt-0.5">Hohe Erwärmung, nur noch für leichte Lasten / Ausmusterung.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charge Amp Calculator Tool -->
+                <div class="bg-blue-50/70 rounded-2xl p-4 border border-blue-100 space-y-3">
+                    <h4 class="font-extrabold text-blue-900 text-sm flex items-center gap-1.5">
+                        <span>🧮 Ladestrom Schneller Rechner</span>
+                    </h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Kapazität (mAh)</label>
+                            <input type="number" id="calcMah" value="3300" step="100" oninput="updateCalcAmps()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm font-extrabold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Gewünschte Laderate (C)</label>
+                            <select id="calcCRate" onchange="updateCalcAmps()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800">
+                                <option value="1">1.0 C (Akkuschonend ~ 60 Min)</option>
+                                <option value="2" selected>2.0 C (Schnellladung ~ 30 Min)</option>
+                                <option value="3">3.0 C (High Speed ~ 20 Min)</option>
+                                <option value="5">5.0 C (Max Speed ~ 12 Min)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-blue-200 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-600">Einzustellender Lader-Strom:</span>
+                        <span id="calcResultAmp" class="text-lg font-black text-blue-600">6.6 Ampere (A)</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: APP INFO & PWA INSTALL -->
+    <div id="appInfoModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-fade-in">
+            
+            <div class="p-6 text-center space-y-4">
+                <!-- Large Exact Custom SVG Icon -->
+                <div id="modalAppIconContainer" class="w-28 h-28 mx-auto drop-shadow-xl hover:scale-105 transition-transform">
+                    <!-- Injected dynamically -->
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-black text-slate-900">Roger’s Akku Manager</h3>
+                    <p class="text-xs font-bold text-blue-600">Version 2.4 Pro • iOS & Mobile Edition</p>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 text-xs text-slate-600 space-y-2 text-left">
+                    <p class="font-bold text-slate-800">📱 Als Web App auf deinem iPhone/iPad installieren:</p>
+                    <ol class="list-decimal pl-4 space-y-1 text-slate-600">
+                        <li>Öffne diese Seite in <strong>Safari</strong>.</li>
+                        <li>Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil).</li>
+                        <li>Wähle <strong>"Zum Home-Bildschirm"</strong>.</li>
+                    </ol>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="closeAppInfoModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3 rounded-xl text-sm active-tap">
+                        Fertig
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CUSTOM NON-BLOCKING CONFIRMATION DIALOG -->
+    <div id="confirmModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl animate-fade-in text-center space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto text-2xl">
+                ⚠️
+            </div>
+            <div>
+                <h3 id="confirmTitle" class="text-base font-extrabold text-slate-900">Aktion bestätigen</h3>
+                <p id="confirmMessage" class="text-xs text-slate-500 mt-1 font-medium">Bist du sicher, dass du diesen Akku dauerhaft löschen möchtest?</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeConfirmModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs">
+                    Abbrechen
+                </button>
+                <button id="confirmBtnAction" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-rose-500/20">
+                    Löschen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastNotification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-5 py-2.5 rounded-full text-xs font-bold shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none flex items-center gap-2">
+        <span id="toastIcon">✅</span>
+        <span id="toastText">Aktion erfolgreich</span>
+    </div>
 
     <script>
-
-        // --- HIGH-CONTRAST BRIGHT 512x512 HOMESCREEN ICON SVG ---
-
-        const brightAppIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-
-            <defs>
-
-                <!-- Bright Gradient Background -->
-
-                <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-
-                    <stop offset="0%" stop-color="#ffffff"/>
-
-                    <stop offset="50%" stop-color="#f0f6ff"/>
-
-                    <stop offset="100%" stop-color="#dbeafe"/>
-
-                </linearGradient>
-
-
-
-                <!-- Vivid Outer Glow Border -->
-
-                <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-
-                    <stop offset="0%" stop-color="#0066ff"/>
-
-                    <stop offset="100%" stop-color="#00c6ff"/>
-
-                </linearGradient>
-
-
-
-                <!-- Dark Crisp Pack Body for Strong Contrast -->
-
-                <linearGradient id="packBody" x1="0%" y1="0%" x2="0%" y2="100%">
-
-                    <stop offset="0%" stop-color="#1e293b"/>
-
-                    <stop offset="100%" stop-color="#0f172a"/>
-
-                </linearGradient>
-
-
-
-                <!-- Bright Gold XT60 Plug -->
-
-                <linearGradient id="xt60Gold" x1="0%" y1="0%" x2="100%" y2="100%">
-
-                    <stop offset="0%" stop-color="#fbbf24"/>
-
-                    <stop offset="100%" stop-color="#d97706"/>
-
-                </linearGradient>
-
-
-
-                <!-- Cables -->
-
-                <linearGradient id="wireRed" x1="0%" y1="0%" x2="100%" y2="0%">
-
-                    <stop offset="0%" stop-color="#ef4444"/>
-
-                    <stop offset="100%" stop-color="#dc2626"/>
-
-                </linearGradient>
-
-
-
-                <!-- Lightning Energy Gradient -->
-
-                <linearGradient id="boltGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-
-                    <stop offset="0%" stop-color="#fef08a"/>
-
-                    <stop offset="50%" stop-color="#f59e0b"/>
-
-                    <stop offset="100%" stop-color="#ea580c"/>
-
-                </linearGradient>
-
-
-
-                <!-- Drop Shadows -->
-
-                <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-
-                    <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#003882" flood-opacity="0.25"/>
-
-                </filter>
-
-                <filter id="boltGlow" x="-20%" y="-20%" width="140%" height="140%">
-
-                    <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#f59e0b" flood-opacity="0.6"/>
-
-                </filter>
-
-            </defs>
-
-
-
-            <!-- App Base (Bright White/Blue Gradient) -->
-
-            <rect width="512" height="512" rx="115" fill="url(#bgGrad)"/>
-
-            <rect x="8" y="8" width="496" height="496" rx="107" fill="none" stroke="url(#borderGrad)" stroke-width="8" stroke-opacity="0.6"/>
-
-
-
-            <!-- Decorative Subtle Tech Circles in Background -->
-
-            <circle cx="256" cy="256" r="210" fill="none" stroke="#0066ff" stroke-opacity="0.08" stroke-width="20"/>
-
-            <circle cx="256" cy="256" r="160" fill="none" stroke="#0066ff" stroke-opacity="0.05" stroke-width="12"/>
-
-
-
-            <!-- XT60 Cables & Plug Top -->
-
-            <g transform="translate(0, -5)">
-
-                <!-- 
-
+        /**
+         * Returns the EXACT custom SVG icon requested by the user.
+         * Generates unique internal gradient IDs to allow multiple instances on page without conflict.
+         */
+        function getCustomSvgIcon(uniqueIdPrefix = 'icon') {
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Heller App-Hintergrund -->
+    <linearGradient id="bgGrad_${uniqueIdPrefix}" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f1f5f9" />
+    </linearGradient>
+
+    <!-- LiPo-Silberfolien-Verlauf -->
+    <linearGradient id="lipoFoil_${uniqueIdPrefix}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="50%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+
+    <!-- Blaue Banderole -->
+    <linearGradient id="bannerGrad_${uniqueIdPrefix}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+
+    <!-- Weicher Schatten für hellen Hintergrund -->
+    <filter id="softShadow_${uniqueIdPrefix}" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Abgerundeter App-Icon-Hintergrund -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad_${uniqueIdPrefix})" stroke="#e2e8f0" stroke-width="4"/>
+
+  <!-- Hauptgruppe mit Schatten -->
+  <g filter="url(#softShadow_${uniqueIdPrefix})">
+    
+    <!-- Balancer-Kabel & Stecker (Links) -->
+    <path d="M175 190 L175 130" fill="none" stroke="#ef4444" stroke-width="6" stroke-linecap="round"/>
+    <path d="M190 190 L190 130" fill="none" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+    <path d="M205 190 L205 130" fill="none" stroke="#3b82f6" stroke-width="6" stroke-linecap="round"/>
+    
+    <!-- Balancer-Stecker -->
+    <rect x="160" y="100" width="55" height="32" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+    <line x1="173" y1="100" x2="173" y2="114" stroke="#94a3b8" stroke-width="3"/>
+    <line x1="188" y1="100" x2="188" y2="114" stroke="#94a3b8" stroke-width="3"/>
+    <line x1="202" y1="100" x2="202" y2="114" stroke="#94a3b8" stroke-width="3"/>
+
+    <!-- Hauptkabel Schwarz & Rot (Rechts) -->
+    <path d="M305 190 C305 130, 325 130, 325 95" fill="none" stroke="#334155" stroke-width="18" stroke-linecap="round"/>
+    <path d="M345 190 C345 130, 375 130, 375 95" fill="none" stroke="#ef4444" stroke-width="18" stroke-linecap="round"/>
+
+    <!-- XT60 Stecker (Gelb) -->
+    <path d="M315 65 L385 65 C393 65, 400 72, 400 80 L390 100 C387 106, 380 110, 373 110 L327 110 C320 110, 313 106, 310 100 L305 80 C305 72, 307 65, 315 65 Z" fill="#f59e0b"/>
+    <circle cx="338" cy="87" r="6" fill="#b45309"/>
+    <circle cx="372" cy="87" r="6" fill="#b45309"/>
+
+    <!-- LiPo Hauptkörper -->
+    <rect x="116" y="180" width="280" height="240" rx="28" fill="url(#lipoFoil_${uniqueIdPrefix})" stroke="#cbd5e1" stroke-width="3"/>
+
+    <!-- Dezent angedeutete Zellenränder -->
+    <line x1="116" y1="215" x2="128" y2="215" stroke="#94a3b8" stroke-width="3"/>
+    <line x1="116" y1="225" x2="128" y2="225" stroke="#94a3b8" stroke-width="3"/>
+    <line x1="384" y1="215" x2="396" y2="215" stroke="#94a3b8" stroke-width="3"/>
+    <line x1="384" y1="225" x2="396" y2="225" stroke="#94a3b8" stroke-width="3"/>
+
+    <!-- Banderole / Label (Blau) -->
+    <rect x="116" y="245" width="280" height="120" fill="url(#bannerGrad_${uniqueIdPrefix})"/>
+
+    <!-- Glanzstreifen -->
+    <rect x="116" y="245" width="280" height="14" fill="#ffffff" opacity="0.25"/>
+
+    <!-- Blitz-Icon & Schriftzug -->
+    <path d="M220 270 L198 308 L216 308 L202 342 L242 296 L222 296 Z" fill="#facc15"/>
+    <text x="254" y="316" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="40" fill="#ffffff" letter-spacing="2">LIPO</text>
+
+    <!-- Spezifikations-Badge -->
+    <rect x="181" y="380" width="150" height="26" rx="13" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="256" y="397" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="13" fill="#1e293b" text-anchor="middle">POWER PACK</text>
+
+  </g>
+</svg>`;
+        }
+
+        const LOCAL_STORAGE_KEY = 'rogers_akku_manager_v2.4';
+
+        // Pre-populated realistic initial battery dataset
+        const initialSampleBatteries = [
+            {
+                id: 'bat_sample_01',
+                name: 'Turnigy Rapid 6S 7000mAh 140C',
+                type: 'LiPo',
+                cells: 6,
+                capacity: 7000,
+                qty: 2,
+                cCont: 140,
+                cBurst: 280,
+                weight: 820,
+                connector: 'XT90',
+                status: 'storage',
+                ir: 1.8,
+                chargeC: 2.0,
+                location: 'Lipo Safe Box A',
+                cycles: 18,
+                purchaseDate: '2024-03-15',
+                notes: 'Freewing Avanti S, Super Tucano 1.6m'
+            },
+            {
+                id: 'bat_sample_02',
+                name: 'Turnigy BoltX 6S 7000mAh 65C',
+                type: 'LiHV',
+                cells: 6,
+                capacity: 7000,
+                qty: 2,
+                cCont: 65,
+                cBurst: 130,
+                weight: 795,
+                connector: 'XT90',
+                status: 'ready',
+                ir: 2.1,
+                chargeC: 2.0,
+                location: 'Lipo Safe Box A',
+                cycles: 12,
+                purchaseDate: '2024-05-10',
+                notes: 'Super Tucano 1.6m (High Voltage)'
+            },
+            {
+                id: 'bat_sample_03',
+                name: 'GensAce Tattu R-Line 4S 1500mAh 120C',
+                type: 'LiPo',
+                cells: 4,
+                capacity: 1500,
+                qty: 4,
+                cCont: 120,
+                cBurst: 240,
+                weight: 178,
+                connector: 'XT60',
+                status: 'ready',
+                ir: 3.2,
+                chargeC: 3.0,
+                location: 'FPV Tasche #1',
+                cycles: 25,
+                purchaseDate: '2024-01-20',
+                notes: '5-Zoll FPV Racing Quad'
+            },
+            {
+                id: 'bat_sample_04',
+                name: 'SLS Quantum 3S 2200mAh 40C',
+                type: 'LiPo',
+                cells: 3,
+                capacity: 2200,
+                qty: 3,
+                cCont: 40,
+                cBurst: 80,
+                weight: 182,
+                connector: 'XT60',
+                status: 'storage',
+                ir: 4.5,
+                chargeC: 1.5,
+                location: 'Flugfeld Koffer #2',
+                cycles: 34,
+                purchaseDate: '2023-09-05',
+                notes: 'Parkflyer / Trainer Modell'
+            },
+            {
+                id: 'bat_sample_05',
+                name: 'CNHL Black Series 4S 1300mAh 100C',
+                type: 'LiPo',
+                cells: 4,
+                capacity: 1300,
+                qty: 2,
+                cCont: 100,
+                cBurst: 200,
+                weight: 155,
+                connector: 'XT60',
+                status: 'discharged',
+                ir: 6.8,
+                chargeC: 2.0,
+                location: 'FPV Tasche #2',
+                cycles: 42,
+                purchaseDate: '2023-11-12',
+                notes: 'CineWhoop 3.5 Inch'
+            },
+            {
+                id: 'bat_sample_06',
+                name: 'Spektrum Smart LiPo 2S 5000mAh 50C',
+                type: 'LiPo',
+                cells: 2,
+                capacity: 5000,
+                qty: 2,
+                cCont: 50,
+                cBurst: 100,
+                weight: 280,
+                connector: 'EC5 / IC5',
+                status: 'ready',
+                ir: 2.8,
+                chargeC: 1.0,
+                location: 'RC Car Kiste',
+                cycles: 8,
+                purchaseDate: '2024-06-01',
+                notes: 'Arrma Big Rock 1/10 Crawler'
+            }
+        ];
+
+        // Global State
+        let batteries = [];
+        let selectedCellFilter = 'ALL';
+        let selectedStatusFilter = 'ALL';
+        let pendingConfirmAction = null;
+
+        // Calculate nominal voltage based on chemistry
+        function getNominalVoltage(type, cells) {
+            const base = { 'LiPo': 3.7, 'LiHV': 3.8, 'LiFe': 3.3, 'LiIon': 3.6 }[type] || 3.7;
+            return cells * base;
+        }
+
+        // Calculate max voltage
+        function getMaxVoltage(type, cells) {
+            const base = { 'LiPo': 4.20, 'LiHV': 4.35, 'LiFe': 3.60, 'LiIon': 4.20 }[type] || 4.20;
+            return cells * base;
+        }
+
+        // Calculate Wh for single pack
+        function calculateWh(item) {
+            const vNom = getNominalVoltage(item.type, item.cells);
+            return (vNom * (item.capacity / 1000));
+        }
+
+        // Get Internal Resistance status text & color
+        function getIRInfo(ir) {
+            if (!ir) return { label: 'k.A.', color: 'text-slate-400 bg-slate-100 border-slate-200' };
+            if (ir < 3.0) return { label: 'Top (<3mΩ)', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' };
+            if (ir <= 7.0) return { label: 'Gut (3-7mΩ)', color: 'text-blue-700 bg-blue-50 border-blue-200' };
+            if (ir <= 15.0) return { label: 'Mäßig (8-15mΩ)', color: 'text-amber-700 bg-amber-50 border-amber-200' };
+            return { label: 'Kritisch (>15mΩ)', color: 'text-rose-700 bg-rose-50 border-rose-200' };
+        }
+
+        // Show Toast Message
+        function showToast(msg, icon = '✅') {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastText').innerText = msg;
+            document.getElementById('toastIcon').innerText = icon;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (raw) {
+                    batteries = JSON.parse(raw);
+                } else {
+                    batteries = [...initialSampleBatteries];
+                    saveData();
+                }
+            } catch (err) {
+                console.error('Error loading data:', err);
+                batteries = [...initialSampleBatteries];
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(batteries));
+        }
+
+        function exportDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(batteries, null, 2));
+            const anchor = document.createElement('a');
+            anchor.setAttribute("href", dataStr);
+            anchor.setAttribute("download", `rogers_akku_manager_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            showToast('JSON Backup heruntergeladen!', '📥');
+        }
+
+        function triggerImportJSON() {
+            document.getElementById('jsonFileInput').click();
+        }
+
+        function handleImportJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed)) {
+                        batteries = parsed;
+                        saveData();
+                        render();
+                        showToast(`${parsed.length} Akkus erfolgreich importiert!`, '📤');
+                    } else {
+                        showToast('Ungültiges Format (Array erwartet)', '❌');
+                    }
+                } catch (err) {
+                    showToast('Fehler beim Lesen der JSON Datei', '❌');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function confirmResetData() {
+            openConfirmModal(
+                'Auf Beispiel-Daten zurücksetzen?',
+                'Achtung: Alle deine aktuell gespeicherten Akkus werden durch die Standard-Akkus ersetzt.',
+                () => {
+                    batteries = [...initialSampleBatteries];
+                    saveData();
+                    render();
+                    showToast('Daten zurückgesetzt', '🔄');
+                }
+            );
+        }
+
+        function renderCellFilterBar() {
+            const bar = document.getElementById('cellFilterBar');
+            
+            // Extract distinct S values
+            const cellSet = new Set(batteries.map(b => b.cells));
+            const sortedCells = Array.from(cellSet).sort((a, b) => a - b);
+
+            let html = `<button onclick="setCellFilter('ALL')" class="active-tap px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${selectedCellFilter === 'ALL' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}">
+                Alle Zellen (${batteries.length})
+            </button>`;
+
+            sortedCells.forEach(s => {
+                const count = batteries.filter(b => b.cells === s).length;
+                const active = selectedCellFilter === s;
+                html += `<button onclick="setCellFilter(${s})" class="active-tap px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${active ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}">
+                    ${s}S (${count})
+                </button>`;
+            });
+
+            bar.innerHTML = html;
+        }
+
+        function renderStatusFilterBar() {
+            const bar = document.getElementById('statusFilterBar');
+            const statuses = [
+                { id: 'ALL', label: 'Alle Status' },
+                { id: 'storage', label: '🟡 Storage (3.85V)' },
+                { id: 'ready', label: '🟢 Voll (4.20V)' },
+                { id: 'discharged', label: '🔴 Entladen' },
+                { id: 'needs_charge', label: '⚡ Ladebedarf' },
+                { id: 'retired', label: '⛔ Ausgemustert' }
+            ];
+
+            let html = '';
+            statuses.forEach(st => {
+                const active = selectedStatusFilter === st.id;
+                html += `<button onclick="setStatusFilter('${st.id}')" class="active-tap px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${active ? 'bg-slate-800 text-white shadow-sm' : 'bg-slate-200/70 text-slate-600 hover:bg-slate-200'}">
+                    ${st.label}
+                </button>`;
+            });
+
+            bar.innerHTML = html;
+        }
+
+        function setCellFilter(val) {
+            selectedCellFilter = val;
+            renderCellFilterBar();
+            render();
+        }
+
+        function setStatusFilter(val) {
+            selectedStatusFilter = val;
+            renderStatusFilterBar();
+            render();
+        }
+
+        function handleSearchInput() {
+            const val = document.getElementById('searchInput').value.trim();
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', !val);
+            render();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            render();
+        }
+
+        function updateBatteryStatus(id, newStatus) {
+            const idx = batteries.findIndex(b => b.id === id);
+            if (idx !== -1) {
+                batteries[idx].status = newStatus;
+                saveData();
+                render();
+                showToast('Status aktualisiert!', '⚡');
+            }
+        }
+
+        function cloneBattery(id) {
+            const original = batteries.find(b => b.id === id);
+            if (!original) return;
+
+            const cloned = {
+                ...original,
+                id: 'bat_' + Date.now(),
+                name: original.name + ' (Kopie)',
+            };
+
+            batteries.unshift(cloned);
+            saveData();
+            render();
+            showToast('Akku geklont!', '📋');
+        }
+
+        function deleteBattery(id) {
+            const item = batteries.find(b => b.id === id);
+            if (!item) return;
+
+            openConfirmModal(
+                'Akku löschen?',
+                `Möchtest du "${item.name}" wirklich aus deiner Liste löschen?`,
+                () => {
+                    batteries = batteries.filter(b => b.id !== id);
+                    saveData();
+                    render();
+                    showToast('Akku gelöscht', '🗑️');
+                }
+            );
+        }
+
+        function render() {
+            renderCellFilterBar();
+            renderStatusFilterBar();
+
+            const container = document.getElementById('batteryListContainer');
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            const sortVal = document.getElementById('sortSelect').value;
+
+            // Filter logic
+            let list = batteries.filter(b => {
+                const matchCells = (selectedCellFilter === 'ALL') || (b.cells === parseInt(selectedCellFilter, 10));
+                const matchStatus = (selectedStatusFilter === 'ALL') || (b.status === selectedStatusFilter);
+
+                const nameMatch = (b.name || '').toLowerCase().includes(searchQuery);
+                const connectorMatch = (b.connector || '').toLowerCase().includes(searchQuery);
+                const locMatch = (b.location || '').toLowerCase().includes(searchQuery);
+                const notesMatch = (b.notes || '').toLowerCase().includes(searchQuery);
+
+                const matchSearch = !searchQuery || (nameMatch || connectorMatch || locMatch || notesMatch);
+
+                return matchCells && matchStatus && matchSearch;
+            });
+
+            // Sorting logic
+            list.sort((a, b) => {
+                if (sortVal === 'cells_desc') return b.cells - a.cells || b.capacity - a.capacity;
+                if (sortVal === 'cells_asc') return a.cells - b.cells || a.capacity - b.capacity;
+                if (sortVal === 'capacity_desc') return b.capacity - a.capacity;
+                if (sortVal === 'capacity_asc') return a.capacity - b.capacity;
+                if (sortVal === 'energy_desc') return (calculateWh(b) * b.qty) - (calculateWh(a) * a.qty);
+                if (sortVal === 'name') return a.name.localeCompare(b.name);
+                if (sortVal === 'cycles_desc') return (b.cycles || 0) - (a.cycles || 0);
+                if (sortVal === 'status') {
+                    const statusOrder = { 'needs_charge': 1, 'discharged': 2, 'storage': 3, 'ready': 4, 'retired': 5 };
+                    return (statusOrder[a.status] || 9) - (statusOrder[b.status] || 9);
+                }
+                return 0;
+            });
+
+            // Update Fleet Analytics Stats
+            const totalPacks = list.reduce((sum, item) => sum + (parseInt(item.qty, 10) || 1), 0);
+            const totalEnergyWh = list.reduce((sum, item) => sum + (calculateWh(item) * (parseInt(item.qty, 10) || 1)), 0);
+            const totalWeightG = list.reduce((sum, item) => sum + ((parseFloat(item.weight) || 0) * (parseInt(item.qty, 10) || 1)), 0);
+
+            document.getElementById('statTotalCount').innerText = list.length;
+            document.getElementById('statPacksCount').innerText = `(${totalPacks} Packs)`;
+            
+            if (totalEnergyWh >= 1000) {
+                document.getElementById('statTotalEnergy').innerText = (totalEnergyWh / 1000).toFixed(2) + ' kWh';
+            } else {
+                document.getElementById('statTotalEnergy').innerText = Math.round(totalEnergyWh) + ' Wh';
+            }
+
+            document.getElementById('statTotalWeight').innerText = (totalWeightG / 1000).toFixed(2) + ' kg';
+
+            const readyCount = list.filter(b => b.status === 'ready').reduce((sum, i) => sum + (parseInt(i.qty, 10) || 1), 0);
+            const storageCount = list.filter(b => b.status === 'storage').reduce((sum, i) => sum + (parseInt(i.qty, 10) || 1), 0);
+            const emptyCount = list.filter(b => b.status === 'discharged' || b.status === 'needs_charge').reduce((sum, i) => sum + (parseInt(i.qty, 10) || 1), 0);
+
+            document.getElementById('statFullCount').innerText = `🟢 ${readyCount}`;
+            document.getElementById('statStorageCount').innerText = `🟡 ${storageCount}`;
+            document.getElementById('statEmptyCount').innerText = `🔴 ${emptyCount}`;
+
+            // Render Empty State if no items found
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200 text-center space-y-4 shadow-ios-sm">
+                        <div class="w-24 h-24 mx-auto opacity-80">
+                            ${getCustomSvgIcon('empty')}
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-slate-800">Keine Akkus gefunden</h3>
+                            <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                                Passe deine Filter oder die Suche an, oder erstelle einen neuen Akku für deine LiPo-Sammlung.
+                            </p>
+                        </div>
+                        <button onclick="openAddBatteryModal()" class="active-tap inline-flex items-center gap-1.5 bg-blue-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md shadow-blue-500/20">
+                            <span>＋ Neuen Akku anlegen</span>
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group batteries by Cell Count (S)
+            const grouped = {};
+            list.forEach(b => {
+                if (!grouped[b.cells]) grouped[b.cells] = [];
+                grouped[b.cells].push(b);
+            });
+
+            const sortedS = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
+
+            let html = '';
+
+            sortedS.forEach(sKey => {
+                const groupItems = grouped[sKey];
+                const groupPacksCount = groupItems.reduce((sum, i) => sum + (parseInt(i.qty, 10) || 1), 0);
+
+                html += `<div class="space-y-2.5">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                            ${sKey}S Akkus & LiPos
+                        </span>
+                        <span class="text-xs font-extrabold bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">
+                            ${groupPacksCount} Stück
+                        </span>
+                    </div>
+                `;
+
+                groupItems.forEach((item, idx) => {
+                    const singleWh = calculateWh(item);
+                    const totalWh = singleWh * item.qty;
+                    const maxContAmps = Math.round((item.capacity / 1000) * item.cCont);
+                    const maxBurstAmps = item.cBurst ? Math.round((item.capacity / 1000) * item.cBurst) : null;
+                    const recChargeAmps = ((item.capacity * (item.chargeC || 1.0)) / 1000).toFixed(1);
+
+                    const irData = getIRInfo(item.ir);
+                    const nominalVolt = getNominalVoltage(item.type, item.cells).toFixed(1);
+                    const maxVolt = getMaxVoltage(item.type, item.cells).toFixed(1);
+
+                    // Type color styling
+                    const typeBadgeColors = {
+                        'LiPo': 'bg-orange-50 text-orange-700 border-orange-200',
+                        'LiHV': 'bg-purple-50 text-purple-700 border-purple-200',
+                        'LiFe': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'LiIon': 'bg-cyan-50 text-cyan-700 border-cyan-200'
+                    }[item.type] || 'bg-slate-100 text-slate-700 border-slate-200';
+
+                    html += `
+                        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-ios-sm hover:shadow-ios-md transition-shadow space-y-3">
+                            
+                            <!-- Card Header Row -->
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="px-2 py-0.5 text-xs font-black rounded-lg border ${typeBadgeColors}">
+                                            ${item.type}
+                                        </span>
+                                        <span class="px-2 py-0.5 text-xs font-black rounded-lg bg-blue-600 text-white">
+                                            ${item.cells}S
+                                        </span>
+                                        ${item.qty > 1 ? `<span class="px-2 py-0.5 text-xs font-black rounded-lg bg-slate-800 text-white">${item.qty}x</span>` : ''}
+                                    </div>
+                                    <h3 class="text-base font-black text-slate-900 mt-1 leading-snug">
+                                        ${escapeHtml(item.name)}
+                                    </h3>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex items-center gap-1 flex-shrink-0">
+                                    <button onclick="cloneBattery('${item.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs active-tap" title="Klonen">
+                                        📋
+                                    </button>
+                                    <button onclick="editBattery('${item.id}')" class="w-8 h-8 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center text-xs active-tap" title="Bearbeiten">
+                                        ✏️
+                                    </button>
+                                    <button onclick="deleteBattery('${item.id}')" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs active-tap" title="Löschen">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Data Grid Badges -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                                <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                    <span class="text-slate-400 font-semibold block">Kapazität & Energie</span>
+                                    <span class="font-extrabold text-blue-600 text-sm">${item.capacity} mAh</span>
+                                    <span class="text-slate-500 font-bold ml-1">(${singleWh.toFixed(1)} Wh)</span>
+                                </div>
+
+                                <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                    <span class="text-slate-400 font-semibold block">Strom & C-Rate</span>
+                                    <span class="font-extrabold text-slate-800">${item.cCont}C</span>
+                                    <span class="text-slate-600 font-bold ml-1">(${maxContAmps} A)</span>
+                                </div>
+
+                                <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                    <span class="text-slate-400 font-semibold block">Gewicht & Stecker</span>
+                                    <span class="font-extrabold text-slate-800">${item.weight}g</span>
+                                    <span class="text-slate-500 font-bold ml-1">• ${escapeHtml(item.connector)}</span>
+                                </div>
+
+                                <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+                                    <span class="text-slate-400 font-semibold block">Empf. Ladung (${item.chargeC || 1.0}C)</span>
+                                    <span class="font-black text-emerald-600 text-sm">➔ ${recChargeAmps} A</span>
+                                </div>
+                            </div>
+
+                            <!-- Extended Info Tags -->
+                            <div class="flex items-center gap-2 flex-wrap text-xs text-slate-600 pt-1">
+                                <span class="px-2 py-0.5 rounded-md border font-extrabold ${irData.color}" title="Innenwiderstand pro Zelle">
+                                    🧪 IR: ${item.ir ? item.ir + ' mΩ' : 'k.A.'}
+                                </span>
+
+                                <span class="bg-slate-100 px-2 py-0.5 rounded-md font-bold text-slate-700">
+                                    ⚡ ${nominalVolt}V (Nenn) / ${maxVolt}V (Max)
+                                </span>
+
+                                ${item.location ? `
+                                    <span class="bg-slate-100 px-2 py-0.5 rounded-md font-bold text-slate-700">
+                                        📦 ${escapeHtml(item.location)}
+                                    </span>
+                                ` : ''}
+
+                                <span class="bg-slate-100 px-2 py-0.5 rounded-md font-bold text-slate-700">
+                                    🔄 ${item.cycles || 0} Zyklen
+                                </span>
+
+                                ${item.notes ? `
+                                    <span class="bg-blue-50 text-blue-800 px-2 py-0.5 rounded-md font-bold border border-blue-100">
+                                        ✈️ ${escapeHtml(item.notes)}
+                                    </span>
+                                ` : ''}
+                            </div>
+
+                            <!-- Quick 1-Tap iOS Segmented Control Bar -->
+                            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                                <span class="text-xs font-bold text-slate-400 hidden sm:inline">Status Tasten:</span>
+                                
+                                <div class="grid grid-cols-4 gap-1 w-full sm:w-auto bg-slate-100 p-1 rounded-xl">
+                                    <button onclick="updateBatteryStatus('${item.id}', 'storage')" class="px-2 py-1.5 rounded-lg text-xs font-extrabold transition-all active-tap ${item.status === 'storage' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+                                        🟡 Storage
+                                    </button>
+                                    <button onclick="updateBatteryStatus('${item.id}', 'ready')" class="px-2 py-1.5 rounded-lg text-xs font-extrabold transition-all active-tap ${item.status === 'ready' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+                                        🟢 Voll
+                                    </button>
+                                    <button onclick="updateBatteryStatus('${item.id}', 'discharged')" class="px-2 py-1.5 rounded-lg text-xs font-extrabold transition-all active-tap ${item.status === 'discharged' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+                                        🔴 Leer
+                                    </button>
+                                    <button onclick="updateBatteryStatus('${item.id}', 'needs_charge')" class="px-2 py-1.5 rounded-lg text-xs font-extrabold transition-all active-tap ${item.status === 'needs_charge' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+                                        ⚡ Laden
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function openAddBatteryModal() {
+            document.getElementById('batteryForm').reset();
+            document.getElementById('formBatteryId').value = '';
+            document.getElementById('modalTitle').innerText = 'Neuen Akku anlegen';
+            document.getElementById('formSubmitBtn').innerText = 'Akku Speichern';
+            document.getElementById('formQty').value = '1';
+            document.getElementById('formChargeC').value = '2.0';
+            document.getElementById('formType').value = 'LiPo';
+            document.getElementById('formStatus').value = 'storage';
+            
+            // Set Modal Icon Preview
+            document.getElementById('modalIconPreview').innerHTML = getCustomSvgIcon('modalForm');
+
+            document.getElementById('batteryModal').classList.remove('hidden');
+        }
+
+        function editBattery(id) {
+            const item = batteries.find(b => b.id === id);
+            if (!item) return;
+
+            document.getElementById('formBatteryId').value = item.id;
+            document.getElementById('formName').value = item.name;
+            document.getElementById('formType').value = item.type;
+            document.getElementById('formStatus').value = item.status;
+            document.getElementById('formCells').value = item.cells;
+            document.getElementById('formCapacity').value = item.capacity;
+            document.getElementById('formQty').value = item.qty || 1;
+            document.getElementById('formCCont').value = item.cCont;
+            document.getElementById('formCBurst').value = item.cBurst || '';
+            document.getElementById('formWeight').value = item.weight;
+            document.getElementById('formConnector').value = item.connector;
+            document.getElementById('formIR').value = item.ir || '';
+            document.getElementById('formChargeC').value = item.chargeC || 2.0;
+            document.getElementById('formLocation').value = item.location || '';
+            document.getElementById('formCycles').value = item.cycles || 0;
+            document.getElementById('formPurchaseDate').value = item.purchaseDate || '';
+            document.getElementById('formNotes').value = item.notes || '';
+
+            document.getElementById('modalTitle').innerText = 'Akku bearbeiten';
+            document.getElementById('formSubmitBtn').innerText = 'Änderungen Speichern';
+            
+            document.getElementById('modalIconPreview').innerHTML = getCustomSvgIcon('modalForm');
+            document.getElementById('batteryModal').classList.remove('hidden');
+        }
+
+        function closeBatteryModal() {
+            document.getElementById('batteryModal').classList.add('hidden');
+        }
+
+        function setBrandPreset(brand) {
+            const current = document.getElementById('formName').value;
+            if (!current) {
+                document.getElementById('formName').value = brand + ' ';
+            } else {
+                document.getElementById('formName').value = brand + ' ' + current;
+            }
+            document.getElementById('formName').focus();
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('formBatteryId').value;
+            const name = document.getElementById('formName').value.trim();
+            const type = document.getElementById('formType').value;
+            const status = document.getElementById('formStatus').value;
+            const cells = parseInt(document.getElementById('formCells').value, 10);
+            const capacity = parseInt(document.getElementById('formCapacity').value, 10);
+            const qty = parseInt(document.getElementById('formQty').value, 10) || 1;
+            const cCont = parseInt(document.getElementById('formCCont').value, 10);
+            const cBurst = document.getElementById('formCBurst').value ? parseInt(document.getElementById('formCBurst').value, 10) : null;
+            const weight = parseFloat(document.getElementById('formWeight').value);
+            const connector = document.getElementById('formConnector').value;
+            const ir = document.getElementById('formIR').value ? parseFloat(document.getElementById('formIR').value) : null;
+            const chargeC = parseFloat(document.getElementById('formChargeC').value) || 2.0;
+            const location = document.getElementById('formLocation').value.trim();
+            const cycles = parseInt(document.getElementById('formCycles').value, 10) || 0;
+            const purchaseDate = document.getElementById('formPurchaseDate').value;
+            const notes = document.getElementById('formNotes').value.trim();
+
+            if (id) {
+                // Update
+                const idx = batteries.findIndex(b => b.id === id);
+                if (idx !== -1) {
+                    batteries[idx] = {
+                        ...batteries[idx],
+                        name, type, status, cells, capacity, qty, cCont, cBurst, weight, connector, ir, chargeC, location, cycles, purchaseDate, notes
+                    };
+                    showToast('Akku erfolgreich aktualisiert!', '✏️');
+                }
+            } else {
+                // Create
+                const newBat = {
+                    id: 'bat_' + Date.now(),
+                    name, type, status, cells, capacity, qty, cCont, cBurst, weight, connector, ir, chargeC, location, cycles, purchaseDate, notes
+                };
+                batteries.unshift(newBat);
+                showToast('Neuer Akku hinzugefügt!', '➕');
+            }
+
+            saveData();
+            closeBatteryModal();
+            render();
+        }
+
+        function openTechGuidesModal() {
+            updateCalcAmps();
+            document.getElementById('techGuidesModal').classList.remove('hidden');
+        }
+
+        function closeTechGuidesModal() {
+            document.getElementById('techGuidesModal').classList.add('hidden');
+        }
+
+        function updateCalcAmps() {
+            const mah = parseFloat(document.getElementById('calcMah').value) || 0;
+            const c = parseFloat(document.getElementById('calcCRate').value) || 1;
+            const amps = ((mah * c) / 1000).toFixed(1);
+            document.getElementById('calcResultAmp').innerText = `${amps} Ampere (A)`;
+        }
+
+        function openAppInfoModal() {
+            document.getElementById('modalAppIconContainer').innerHTML = getCustomSvgIcon('appInfo');
+            document.getElementById('appInfoModal').classList.remove('hidden');
+        }
+
+        function closeAppInfoModal() {
+            document.getElementById('appInfoModal').classList.add('hidden');
+        }
+
+        function openConfirmModal(title, msg, onConfirm) {
+            document.getElementById('confirmTitle').innerText = title;
+            document.getElementById('confirmMessage').innerText = msg;
+            pendingConfirmAction = onConfirm;
+
+            document.getElementById('confirmBtnAction').onclick = function() {
+                if (pendingConfirmAction) pendingConfirmAction();
+                closeConfirmModal();
+            };
+
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            pendingConfirmAction = null;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Render exact SVG icon into Header Container
+            const headerIconHtml = getCustomSvgIcon('header');
+            document.getElementById('headerIconContainer').innerHTML = headerIconHtml;
+
+            // Generate Favicon and Apple Touch Icon Data URI dynamically from exact SVG
+            const svgDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(getCustomSvgIcon('favicon'));
+            document.getElementById('dynamicFavicon').setAttribute('href', svgDataUrl);
+            document.getElementById('dynamicAppleIcon').setAttribute('href', svgDataUrl);
+
+            // Load battery data and render UI
+            loadData();
+            render();
+        });
+    </script>
+</body>
+</html>
