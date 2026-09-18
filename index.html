@@ -211,44 +211,16 @@
             font-size: 11px;
         }
 
-        /* STATS BAR */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        /* SEARCH BAR & COMPACT INLINE STAT */
+        .search-inline-container {
+            display: flex;
+            align-items: center;
             gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-md);
-            padding: 10px 8px;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-        }
-
-        .stat-value {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .stat-label {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-
-        /* SEARCH BAR & QUICK FILTERS */
-        .search-container {
             margin-bottom: 8px;
         }
 
         .search-input {
+            flex: 1;
             width: 100%;
             padding: 10px 14px;
             border-radius: var(--radius-md);
@@ -259,6 +231,36 @@
             box-shadow: var(--shadow-sm);
         }
 
+        .stat-inline-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 9px 12px;
+            box-shadow: var(--shadow-sm);
+            white-space: nowrap;
+            flex-shrink: 0;
+            height: 42px;
+        }
+
+        .stat-inline-value {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-inline-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* QUICK FILTERS */
         .s-filter-bar {
             display: flex;
             gap: 6px;
@@ -753,25 +755,13 @@
         </p>
     </div>
 
-    <!-- STATISTIK BAR -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value" id="statCount">0</div>
-            <div class="stat-label">Akkus Gesamt</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="statCapacity">0 Ah</div>
-            <div class="stat-label">Gesamtkapazität</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="statWeight">0 g</div>
-            <div class="stat-label">Gesamtgewicht</div>
-        </div>
-    </div>
-
-    <!-- SCHNELLSUCHE & SCHNELL-FILTER -->
-    <div class="search-container">
+    <!-- SCHNELLSUCHE & KOMPAKTE ANZAHL-ANZEIGE IN EINER ZEILE -->
+    <div class="search-inline-container">
         <input type="text" class="search-input" id="searchInput" placeholder="🔍 Suche (z. B. CNHL, 1500, Tattu)..." oninput="render()">
+        <div class="stat-inline-badge">
+            <span class="stat-inline-value" id="statCount">0</span>
+            <span class="stat-inline-label">Akkus</span>
+        </div>
     </div>
 
     <!-- SCHNELL-FILTER NACH ZELLENZAHL (S) -->
@@ -784,7 +774,7 @@
             <button type="button" class="btn-close-form" onclick="hideForm()">✕</button>
         </div>
         
-        <form id="lipoForm">
+        <form id="lipoForm" onsubmit="handleSubmit(event)">
             <div class="grid-form">
                 <div class="form-group full-width">
                     <label>Hersteller (Optional)</label>
@@ -843,7 +833,7 @@
 
                 <div class="form-group">
                     <label>Laderate (C)</label>
-                    <input type="number" id="chargeRate" placeholder="z. B. 1.0" step="0.1" inputmode="decimal" required>
+                    <input type="number" id="chargeRate" placeholder="z. B. 1.0" step="0.1" inputmode="decimal" value="1.0" required>
                 </div>
 
                 <div class="form-group">
@@ -878,7 +868,7 @@
     </div>
 
     <script>
-        // --- CNHL SVG ICON ---
+        // --- SVG ICON GENERATION ---
         const cnhlGPlusIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
             <defs>
                 <linearGradient id="cnhl-bg" x1="0" y1="0" x2="0" y2="1">
@@ -897,334 +887,150 @@
                     <stop offset="0%" stop-color="#27272a"/>
                     <stop offset="100%" stop-color="#09090b"/>
                 </linearGradient>
-                <filter id="cnhl-glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity="0.75"/>
-                    <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#84cc16" flood-opacity="0.3"/>
-                </filter>
             </defs>
             <rect width="512" height="512" rx="115" fill="url(#cnhl-bg)"/>
             <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#84cc16" stroke-opacity="0.25" stroke-width="3"/>
-            <g filter="url(#cnhl-glow)">
+            <g>
                 <path d="M 220 135 C 210 70, 270 65, 295 55" stroke="#ef4444" stroke-width="20" fill="none" stroke-linecap="round"/>
                 <path d="M 185 135 C 175 55, 235 50, 260 40" stroke="#3f3f46" stroke-width="20" fill="none" stroke-linecap="round"/>
                 <rect x="275" y="28" width="58" height="40" rx="8" fill="url(#xt60-grad)" transform="rotate(-15 300 48)"/>
-                <path d="M 320 135 C 330 95, 360 90, 370 75" stroke="#e4e4e7" stroke-width="9" fill="none"/>
-                <rect x="360" y="55" width="24" height="30" rx="4" fill="#ffffff" transform="rotate(12 372 70)"/>
                 <rect x="110" y="125" width="292" height="310" rx="26" fill="url(#pack-body)"/>
                 <rect x="110" y="125" width="292" height="48" rx="26" fill="#18181b"/>
-                <rect x="110" y="150" width="292" height="23" fill="#18181b"/>
-                <line x1="110" y1="173" x2="402" y2="173" stroke="#27272a" stroke-width="2"/>
                 <path d="M 110 210 L 402 180 L 402 225 L 110 255 Z" fill="url(#cnhl-green)"/>
-                <rect x="126" y="240" width="260" height="175" rx="14" fill="#000000" fill-opacity="0.8" stroke="#27272a" stroke-width="1.5"/>
-                <text x="145" y="286" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="36" letter-spacing="2">CNHL</text>
-                <rect x="285" y="252" width="82" height="42" rx="8" fill="url(#cnhl-green)"/>
-                <text x="326" y="283" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="26" text-anchor="middle">G+</text>
-                <text x="145" y="325" fill="#84cc16" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="18" letter-spacing="1">GRAPHENE</text>
-                <text x="145" y="358" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="28" letter-spacing="1">70C / 140C</text>
-                <text x="365" y="390" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="16" text-anchor="end">4S LiPo</text>
+                <text x="145" y="286" fill="#ffffff" font-family="-apple-system, sans-serif" font-weight="900" font-size="36" letter-spacing="2">CNHL</text>
             </g>
         </svg>`;
 
         document.getElementById('headerIcon').innerHTML = cnhlGPlusIcon;
 
-        (function generateAppIcons() {
-            const blob = new Blob([cnhlGPlusIcon], {type: 'image/svg+xml;charset=utf-8'});
-            const url = URL.createObjectURL(blob);
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = 512;
-                canvas.height = 512;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const pngUrl = canvas.toDataURL('image/png');
-                document.getElementById('appleTouchIcon').href = pngUrl;
-                document.getElementById('favicon').href = pngUrl;
-                URL.revokeObjectURL(url);
-            };
-            img.src = url;
-        })();
+        // Set Favicon and Apple Touch Icon dynamically
+        const svgBlob = new Blob([cnhlGPlusIcon], {type: 'image/svg+xml'});
+        const svgUrl = URL.createObjectURL(svgBlob);
+        document.getElementById('favicon').href = svgUrl;
+        document.getElementById('appleTouchIcon').href = svgUrl;
 
-        // --- STATE & DATA ---
-        let batteries = [];
-        try {
-            batteries = JSON.parse(localStorage.getItem('lipo_batteries_db')) || [];
-        } catch (e) {}
+        // --- APP STATE & INITIAL DATA ---
+        const initialBatteries = [
+            { id: "1", manufacturer: "CNHL", type: "LiPo", capacity: 1500, cellCount: 4, qty: 3, weight: 185, chargeRate: 1, dischargeRate: "100C", status: "ready", purchaseDate: "2023-05-12" },
+            { id: "2", manufacturer: "Tattu", type: "LiPo", capacity: 1300, cellCount: 6, qty: 2, weight: 212, chargeRate: 2, dischargeRate: "120C", status: "ready", purchaseDate: "2023-08-20" },
+            { id: "3", manufacturer: "SLS", type: "LiHV", capacity: 5000, cellCount: 6, qty: 1, weight: 720, chargeRate: 1, dischargeRate: "45C", status: "storage", purchaseDate: "2022-11-05" },
+            { id: "4", manufacturer: "Turnigy", type: "LiPo", capacity: 2200, cellCount: 3, qty: 4, weight: 190, chargeRate: 1, dischargeRate: "35C", status: "ready", purchaseDate: "2021-04-15" }
+        ];
 
+        let batteries = JSON.parse(localStorage.getItem('rogers_lipos')) || initialBatteries;
+        let activeSFilter = 'all';
         let editingId = null;
-        let activeSFilter = 'ALL';
 
-        function toggleCheatSheet(cardId) {
-            const target = document.getElementById(cardId);
-            const isOpen = target.style.display === 'block';
+        function saveToStorage() {
+            localStorage.setItem('rogers_lipos', JSON.stringify(batteries));
+        }
+
+        // --- RENDER LOGIC ---
+        function renderSFilters() {
+            const container = document.getElementById('sFilterBar');
+            const sMap = new Map();
             
-            // Beide Karten schließen
-            document.getElementById('cheatCard').style.display = 'none';
-            document.getElementById('ohmCard').style.display = 'none';
-
-            // Wenn die gewählte Karte zu war, jetzt öffnen
-            if (!isOpen) {
-                target.style.display = 'block';
-            }
-        }
-
-        function toggleForm() {
-            const card = document.getElementById('formCard');
-            if (card.style.display === 'none' || card.style.display === '') showForm();
-            else hideForm();
-        }
-
-        function showForm() {
-            const card = document.getElementById('formCard');
-            card.style.display = 'block';
-            document.getElementById('toggleFormBtn').classList.add('active');
-            document.getElementById('addIconSymbol').innerText = '✕';
-            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function hideForm() {
-            cancelEdit();
-            const card = document.getElementById('formCard');
-            card.style.display = 'none';
-            document.getElementById('toggleFormBtn').classList.remove('active');
-            document.getElementById('addIconSymbol').innerText = '＋';
-        }
-
-        function setManufacturer(name) {
-            document.getElementById('manufacturer').value = name;
-        }
-
-        function setSFilter(sVal) {
-            activeSFilter = sVal;
-            render();
-        }
-
-        function formatDischarge(val) {
-            if (!val) return '-';
-            let str = String(val).trim();
-            return str.toLowerCase().endsWith('c') ? str : str + 'C';
-        }
-
-        document.getElementById('lipoForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const batteryData = {
-                manufacturer: document.getElementById('manufacturer').value.trim() || "-",
-                type: document.getElementById('type').value,
-                status: document.getElementById('status').value,
-                capacity: parseInt(document.getElementById('capacity').value),
-                cellCount: parseInt(document.getElementById('cellCount').value),
-                qty: parseInt(document.getElementById('qty').value) || 1,
-                chargeRate: parseFloat(document.getElementById('chargeRate').value),
-                dischargeRate: document.getElementById('dischargeRate').value.trim(),
-                weight: parseFloat(document.getElementById('weight').value),
-                purchaseDate: document.getElementById('purchaseDate').value || ""
-            };
-
-            if (editingId !== null) {
-                const index = batteries.findIndex(b => b.id === editingId);
-                if (index !== -1) batteries[index] = { id: editingId, ...batteryData };
-            } else {
-                batteries.push({ id: Date.now(), ...batteryData });
-            }
-
-            saveAndRender();
-            hideForm();
-        });
-
-        function editBattery(id) {
-            const b = batteries.find(item => item.id === id);
-            if (!b) return;
-
-            editingId = id;
-            document.getElementById('manufacturer').value = b.manufacturer === '-' ? '' : b.manufacturer;
-            document.getElementById('type').value = b.type;
-            document.getElementById('status').value = b.status || 'ready';
-            document.getElementById('capacity').value = b.capacity;
-            document.getElementById('cellCount').value = b.cellCount;
-            document.getElementById('qty').value = b.qty || 1;
-            document.getElementById('weight').value = b.weight;
-            document.getElementById('chargeRate').value = b.chargeRate;
-            document.getElementById('dischargeRate').value = b.dischargeRate || '';
-            document.getElementById('purchaseDate').value = b.purchaseDate;
-
-            document.getElementById('formTitle').innerText = "✏️ Akku bearbeiten";
-            document.getElementById('submitBtn').innerText = "Änderung Speichern";
-            showForm();
-        }
-
-        function cancelEdit() {
-            editingId = null;
-            document.getElementById('lipoForm').reset();
-            document.getElementById('type').value = "LiPo";
-            document.getElementById('status').value = "ready";
-            document.getElementById('qty').value = "1";
-            document.getElementById('formTitle').innerText = "➕ Neuen Akku hinzufügen";
-            document.getElementById('submitBtn').innerText = "Akku Speichern";
-        }
-
-        function deleteBattery(id) {
-            if (confirm("Möchtest du diesen Akku wirklich löschen?")) {
-                batteries = batteries.filter(b => b.id !== id);
-                if (editingId === id) cancelEdit();
-                saveAndRender();
-            }
-        }
-
-        function saveAndRender() {
-            try {
-                localStorage.setItem('lipo_batteries_db', JSON.stringify(batteries));
-            } catch (e) {}
-            render();
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return 'k. A.';
-            const parts = dateStr.split('-');
-            return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateStr;
-        }
-
-        function exportData() {
-            if (!batteries.length) return alert("Keine Akkus zum Exportieren vorhanden.");
-            const blob = new Blob([JSON.stringify(batteries, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `rogers_akkus_backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        batteries = imported;
-                        saveAndRender();
-                        alert("Import erfolgreich!");
-                    } else {
-                        alert("Ungültiges Dateiformat.");
-                    }
-                } catch (err) {
-                    alert("Fehler beim Importieren der Datei.");
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        function renderFilterBar() {
-            const filterBar = document.getElementById('sFilterBar');
-            const presentSCounts = Array.from(new Set(batteries.map(b => b.cellCount))).sort((a,b) => a - b);
-
-            let filterHtml = `<button type="button" class="btn-s-chip ${activeSFilter === 'ALL' ? 'active' : ''}" onclick="setSFilter('ALL')">Alle</button>`;
-
-            presentSCounts.forEach(s => {
-                filterHtml += `<button type="button" class="btn-s-chip ${activeSFilter === String(s) ? 'active' : ''}" onclick="setSFilter('${s}')">${s}S</button>`;
+            batteries.forEach(b => {
+                sMap.set(b.cellCount, (sMap.get(b.cellCount) || 0) + b.qty);
             });
 
-            filterBar.innerHTML = filterHtml;
+            const sortedS = Array.from(sMap.keys()).sort((a, b) => a - b);
+            let html = `<button class="btn-s-chip ${activeSFilter === 'all' ? 'active' : ''}" onclick="setSFilter('all')">Alle (${batteries.reduce((a,c)=>a+c.qty,0)})</button>`;
+
+            sortedS.forEach(s => {
+                html += `<button class="btn-s-chip ${activeSFilter === s ? 'active' : ''}" onclick="setSFilter(${s})">${s}S (${sMap.get(s)})</button>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function setSFilter(s) {
+            activeSFilter = s;
+            render();
         }
 
         function render() {
-            renderFilterBar();
-
-            const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            renderSFilters();
             const listEl = document.getElementById('batteryList');
-            
-            const filtered = batteries.filter(b => {
-                const term = `${b.manufacturer} ${b.type} ${b.cellCount}s ${b.capacity}mah ${b.status}`.toLowerCase();
-                const matchesSearch = term.includes(search);
-                const matchesS = (activeSFilter === 'ALL') || (String(b.cellCount) === String(activeSFilter));
-                return matchesSearch && matchesS;
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            let filtered = batteries.filter(b => {
+                const matchesS = (activeSFilter === 'all') || (b.cellCount === Number(activeSFilter));
+                const text = `${b.manufacturer || ''} ${b.capacity} ${b.cellCount}S ${b.type}`.toLowerCase();
+                const matchesSearch = text.includes(searchVal);
+                return matchesS && matchesSearch;
             });
 
-            let totalCount = 0;
-            let totalCapMah = 0;
-            let totalWeightG = 0;
-
-            batteries.forEach(b => {
-                const q = b.qty || 1;
-                totalCount += q;
-                totalCapMah += (b.capacity || 0) * q;
-                totalWeightG += (b.weight || 0) * q;
-            });
-
+            // Update stats (Count)
+            const totalCount = filtered.reduce((sum, b) => sum + b.qty, 0);
             document.getElementById('statCount').innerText = totalCount;
-            document.getElementById('statCapacity').innerText = (totalCapMah / 1000).toFixed(1) + ' Ah';
-            document.getElementById('statWeight').innerText = Math.round(totalWeightG) + ' g';
 
             if (filtered.length === 0) {
                 listEl.innerHTML = `
                     <div class="empty-state">
-                        <p>Keine Akkus vorhanden oder gefunden.</p>
-                        <button class="btn-empty-add" onclick="showForm()">＋ Ersten Akku anlegen</button>
+                        <p style="margin:0; font-weight: 700; font-size:15px; color: var(--text-dark);">Keine Akkus gefunden</p>
+                        <p style="margin:4px 0 0 0; font-size:12px;">Passe die Suche an oder füge neue Akkus hinzu.</p>
+                        <button class="btn-empty-add" onclick="toggleForm()">＋ Akku hinzufügen</button>
                     </div>
                 `;
                 return;
             }
 
+            // Group by Cell Count (S)
             const groups = {};
             filtered.forEach(b => {
-                const key = b.cellCount || 0;
-                if (!groups[key]) groups[key] = [];
-                groups[key].push(b);
+                if (!groups[b.cellCount]) groups[b.cellCount] = [];
+                groups[b.cellCount].push(b);
             });
 
-            const sortedKeys = Object.keys(groups).sort((a,b) => parseInt(a) - parseInt(b));
+            const sortedSKeys = Object.keys(groups).sort((a, b) => Number(a) - Number(b));
 
             let html = '';
-            sortedKeys.forEach(s => {
-                const groupBatteries = groups[s];
-                const groupQty = groupBatteries.reduce((sum, item) => sum + (item.qty || 1), 0);
+            sortedSKeys.forEach(sVal => {
+                const groupItems = groups[sVal];
+                const groupQty = groupItems.reduce((acc, item) => acc + item.qty, 0);
 
                 html += `
                     <div class="section-header">
-                        <span>${s}S Akkus</span>
+                        <span>⚡ ${sVal}S Akkus</span>
                         <span class="section-badge">${groupQty} Stk.</span>
                     </div>
                     <div class="table-container">
                 `;
 
-                groupBatteries.forEach(b => {
-                    const chargeAmp = ((b.capacity * (b.chargeRate || 1)) / 1000).toFixed(1);
-                    const typeClass = `type-${(b.type || 'lipo').toLowerCase()}`;
-                    
-                    let statusBadgeHtml = '';
-                    if (b.status === 'storage') {
-                        statusBadgeHtml = `<span class="status-badge status-storage">🟡 Storage</span>`;
-                    } else if (b.status === 'retired') {
-                        statusBadgeHtml = `<span class="status-badge status-retired">🔴 Ausgemustert</span>`;
-                    }
+                groupItems.forEach(item => {
+                    const typeClass = `type-${(item.type || 'lipo').toLowerCase()}`;
+                    const chargeAmp = ((item.capacity / 1000) * (item.chargeRate || 1)).toFixed(1);
 
-                    const hasMfg = b.manufacturer && b.manufacturer !== '-';
+                    let statusBadgeHtml = '';
+                    if (item.status === 'storage') {
+                        statusBadgeHtml = `<span class="status-badge status-storage">Storage</span>`;
+                    } else if (item.status === 'retired') {
+                        statusBadgeHtml = `<span class="status-badge status-retired">Ausgemustert</span>`;
+                    }
 
                     html += `
                         <div class="battery-item">
                             <div class="battery-main-row">
                                 <div class="akku-title">
-                                    <span class="type-badge ${typeClass}">${b.type}</span>
-                                    ${b.qty > 1 ? `<span class="qty-badge">${b.qty}x</span>` : ''}
-                                    <span class="mfg-cap-line">
-                                        ${hasMfg ? `<span class="manufacturer-tag">${b.manufacturer}</span>` : ''}
-                                        <span class="cap-tag">${b.capacity} mAh</span>
-                                    </span>
+                                    <span class="type-badge ${typeClass}">${item.type}</span>
+                                    <span class="qty-badge">${item.qty}x</span>
+                                    <div class="mfg-cap-line">
+                                        <span class="manufacturer-tag">${item.manufacturer ? item.manufacturer : ''}</span>
+                                        <span class="cap-tag">${item.capacity} mAh</span>
+                                    </div>
                                     ${statusBadgeHtml}
                                 </div>
                                 <div class="action-btns">
-                                    <button class="btn-action btn-edit" onclick="editBattery(${b.id})" title="Bearbeiten">✏️</button>
-                                    <button class="btn-action btn-del" onclick="deleteBattery(${b.id})" title="Löschen">🗑️</button>
+                                    <button class="btn-action btn-edit" onclick="editBattery('${item.id}')" title="Bearbeiten">✏️</button>
+                                    <button class="btn-action btn-del" onclick="deleteBattery('${item.id}')" title="Löschen">🗑️</button>
                                 </div>
                             </div>
                             <div class="battery-data-row">
-                                <span class="data-badge">Ladung: <strong class="charge-amp-highlight">${chargeAmp} A</strong> (${b.chargeRate}C)</span>
-                                <span class="data-badge">Entladung: <strong>${formatDischarge(b.dischargeRate)}</strong></span>
-                                <span class="data-badge">Gewicht: <strong>${b.weight} g</strong></span>
-                                ${b.purchaseDate ? `<span class="data-badge">Kauf: <strong>${formatDate(b.purchaseDate)}</strong></span>` : ''}
+                                <span class="data-badge">Gewicht: <strong>${item.weight}g</strong></span>
+                                <span class="data-badge">Entladen: <strong>${item.dischargeRate}</strong></span>
+                                <span class="data-badge charge-amp-highlight">Laden: ${chargeAmp}A (${item.chargeRate || 1}C)</span>
+                                ${item.purchaseDate ? `<span class="data-badge">📅 ${item.purchaseDate}</span>` : ''}
                             </div>
                         </div>
                     `;
@@ -1236,6 +1042,149 @@
             listEl.innerHTML = html;
         }
 
+        // --- FORM & ACTIONS ---
+        function toggleForm() {
+            const card = document.getElementById('formCard');
+            const btn = document.getElementById('toggleFormBtn');
+            const isVisible = card.style.display === 'block';
+
+            if (isVisible) {
+                hideForm();
+            } else {
+                card.style.display = 'block';
+                btn.classList.add('active');
+                document.getElementById('addIconSymbol').innerText = '✕';
+                if (!editingId) resetForm();
+            }
+        }
+
+        function hideForm() {
+            document.getElementById('formCard').style.display = 'none';
+            const btn = document.getElementById('toggleFormBtn');
+            btn.classList.remove('active');
+            document.getElementById('addIconSymbol').innerText = '＋';
+            resetForm();
+        }
+
+        function resetForm() {
+            editingId = null;
+            document.getElementById('lipoForm').reset();
+            document.getElementById('formTitle').innerText = '➕ Neuen Akku hinzufügen';
+            document.getElementById('submitBtn').innerText = 'Akku Speichern';
+            document.getElementById('qty').value = '1';
+            document.getElementById('chargeRate').value = '1.0';
+        }
+
+        function setManufacturer(name) {
+            document.getElementById('manufacturer').value = name;
+        }
+
+        function toggleCheatSheet(id) {
+            const card = document.getElementById(id);
+            const isVisible = card.style.display === 'block';
+            card.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+
+            const manufacturer = document.getElementById('manufacturer').value.trim();
+            const type = document.getElementById('type').value;
+            const status = document.getElementById('status').value;
+            const capacity = Number(document.getElementById('capacity').value);
+            const cellCount = Number(document.getElementById('cellCount').value);
+            const qty = Number(document.getElementById('qty').value);
+            const weight = Number(document.getElementById('weight').value);
+            const chargeRate = parseFloat(document.getElementById('chargeRate').value) || 1.0;
+            const dischargeRate = document.getElementById('dischargeRate').value.trim();
+            const purchaseDate = document.getElementById('purchaseDate').value;
+
+            if (editingId) {
+                batteries = batteries.map(b => b.id === editingId ? {
+                    id: editingId,
+                    manufacturer, type, status, capacity, cellCount, qty, weight, chargeRate, dischargeRate, purchaseDate
+                } : b);
+            } else {
+                const newBattery = {
+                    id: Date.now().toString(),
+                    manufacturer, type, status, capacity, cellCount, qty, weight, chargeRate, dischargeRate, purchaseDate
+                };
+                batteries.push(newBattery);
+            }
+
+            saveToStorage();
+            render();
+            hideForm();
+        }
+
+        function editBattery(id) {
+            const item = batteries.find(b => b.id === id);
+            if (!item) return;
+
+            editingId = id;
+            document.getElementById('manufacturer').value = item.manufacturer || '';
+            document.getElementById('type').value = item.type || 'LiPo';
+            document.getElementById('status').value = item.status || 'ready';
+            document.getElementById('capacity').value = item.capacity;
+            document.getElementById('cellCount').value = item.cellCount;
+            document.getElementById('qty').value = item.qty;
+            document.getElementById('weight').value = item.weight;
+            document.getElementById('chargeRate').value = item.chargeRate || 1.0;
+            document.getElementById('dischargeRate').value = item.dischargeRate;
+            document.getElementById('purchaseDate').value = item.purchaseDate || '';
+
+            document.getElementById('formTitle').innerText = '✏️ Akku bearbeiten';
+            document.getElementById('submitBtn').innerText = 'Änderungen Speichern';
+
+            document.getElementById('formCard').style.display = 'block';
+            document.getElementById('toggleFormBtn').classList.add('active');
+            document.getElementById('addIconSymbol').innerText = '✕';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteBattery(id) {
+            if (confirm('Möchtest du diesen Akku-Eintrag wirklich löschen?')) {
+                batteries = batteries.filter(b => b.id !== id);
+                saveToStorage();
+                render();
+            }
+        }
+
+        // --- BACKUP EXPORT & IMPORT ---
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(batteries, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `Rogers_Akku_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dlAnchorElem);
+            dlAnchorElem.click();
+            dlAnchorElem.remove();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        batteries = imported;
+                        saveToStorage();
+                        render();
+                        alert('Akkus erfolgreich importiert!');
+                    } else {
+                        alert('Ungültiges Dateiformat.');
+                    }
+                } catch (err) {
+                    alert('Fehler beim Lesen der Backup-Datei.');
+                }
+            };
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0]);
+            }
+        }
+
+        // --- INITIAL RENDER ---
         render();
     </script>
 </body>
